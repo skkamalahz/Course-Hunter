@@ -4,18 +4,18 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, FileText, Mail, ExternalLink, Briefcase } from 'lucide-react';
+import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail, ExternalLink, Briefcase, User } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
 
 const iconMap: { [key: string]: any } = {
-  Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, FileText, Mail
+  Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail
 };
 
 export default function HomePage() {
   const [hero, setHero] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
-  const [team, setTeam] = useState<any[]>([]);
+  const [founders, setFounders] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,16 @@ export default function HomePage() {
 
         if (heroData) setHero(heroData);
         if (servicesData) setServices(servicesData);
-        if (teamData) setTeam(teamData);
+        if (teamData) {
+          // Filter for Founders or Management for the home page
+          const founderList = teamData.filter(m =>
+            m.category === 'Founder' ||
+            m.category === 'Founders' ||
+            m.role.toLowerCase().includes('founder') ||
+            m.role.toLowerCase().includes('ceo')
+          );
+          setFounders(founderList.length > 0 ? founderList : teamData.slice(0, 3));
+        }
         if (clientsData) setClients(clientsData);
         if (portfolioData) setPortfolio(portfolioData);
       } catch (error) {
@@ -85,10 +94,10 @@ export default function HomePage() {
             <div className="text-center max-w-4xl">
               <h1 className="text-6xl md:text-8xl font-black mb-8 leading-tight tracking-tighter">
                 <span className="text-white block">
-                  {hero?.title.split(',')[0]},
+                  {hero?.title.split(',')[0] || 'Digital'},
                 </span>
                 <span className="text-accent-500 block mt-2">
-                  {hero?.title.split(',')[1]?.trim() || 'our solution'}
+                  {hero?.title.split(',')[1]?.trim() || 'Marketing Solutions'}
                 </span>
               </h1>
 
@@ -123,15 +132,15 @@ export default function HomePage() {
 
         {/* Our Clients */}
         {clients.length > 0 && (
-          <section className="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden text-center">
+          <section className="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden text-center border-y border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <motion.h2
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold mb-12 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent"
+                className="text-2xl md:text-3xl font-black mb-12 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent uppercase tracking-tight"
               >
-                Our clients
+                Our Trusted Clients
               </motion.h2>
               <div className="flex flex-wrap justify-center gap-12 items-center">
                 {clients.map((client, index) => (
@@ -142,7 +151,9 @@ export default function HomePage() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <span className="text-2xl font-bold text-gray-400 grayscale hover:grayscale-0 transition-all duration-300">{client.name}</span>
+                    <span className="text-xl md:text-2xl font-black text-gray-400 grayscale hover:grayscale-0 transition-all duration-300 cursor-default uppercase">
+                      {client.name}
+                    </span>
                   </motion.div>
                 ))}
               </div>
@@ -154,7 +165,8 @@ export default function HomePage() {
         <section className="py-24 bg-white relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Our Services</h2>
+              <h2 className="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tighter">Our Services</h2>
+              <div className="h-1.5 w-20 bg-primary-500 mx-auto mb-6"></div>
               <p className="text-gray-600 max-w-2xl mx-auto">Providing end-to-end marketing solutions tailored to your business needs.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
@@ -190,7 +202,8 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-end mb-16">
                 <div>
-                  <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">Latest Work</h2>
+                  <h2 className="text-4xl md:text-5xl font-black mb-4 text-white uppercase tracking-tighter">Latest Work</h2>
+                  <div className="h-1.5 w-20 bg-accent-500 mb-6"></div>
                   <p className="text-gray-400 max-w-2xl">Handpicked projects that showcase our expertise and impact.</p>
                 </div>
                 <Link href="/our-work" className="hidden md:flex items-center space-x-2 text-accent-500 font-bold group">
@@ -223,15 +236,9 @@ export default function HomePage() {
                       </div>
                     </div>
                     <span className="text-accent-500 font-bold text-sm uppercase tracking-widest">{project.category}</span>
-                    <h3 className="text-2xl font-bold mt-2 group-hover:text-accent-500 transition-colors">{project.title}</h3>
+                    <h3 className="text-2xl font-bold mt-2 group-hover:text-accent-500 transition-colors uppercase tracking-tight">{project.title}</h3>
                   </motion.div>
                 ))}
-              </div>
-              <div className="mt-12 text-center md:hidden">
-                <Link href="/our-work" className="inline-flex items-center space-x-2 text-accent-500 font-bold">
-                  <span>View All Projects</span>
-                  <ArrowRight size={20} />
-                </Link>
               </div>
             </div>
           </section>
@@ -239,30 +246,37 @@ export default function HomePage() {
 
         {/* Meet the Founders */}
         <section className="py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl font-bold text-center mb-16">Meet the Founders</h2>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-4xl font-black mb-4 uppercase tracking-tighter">Meet the Leadership</h2>
+            <div className="h-1.5 w-20 bg-primary-500 mx-auto mb-16"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {team.map((member, index) => (
+              {founders.map((member, index) => (
                 <motion.div
                   key={member.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2 }}
-                  className="p-6 bg-white rounded-3xl shadow-xl flex flex-col h-full"
+                  className="p-8 bg-white rounded-3xl shadow-xl flex flex-col h-full hover:shadow-2xl transition-all border border-gray-100 group"
                 >
-                  <div className="aspect-square bg-gray-100 rounded-2xl mb-6 overflow-hidden flex items-center justify-center">
+                  <div className="aspect-square bg-gray-50 rounded-2xl mb-6 overflow-hidden flex items-center justify-center border-2 border-primary-50 group-hover:border-primary-100 transition-all">
                     {member.image_url ? (
-                      <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" />
+                      <img src={member.image_url} alt={member.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     ) : (
-                      <Users className="text-gray-300" size={64} />
+                      <User className="text-gray-200" size={64} />
                     )}
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
-                  <p className="text-primary-600 font-semibold mb-3">{member.role}</p>
-                  <p className="text-gray-600 flex-grow">{member.bio}</p>
+                  <h3 className="text-2xl font-bold mb-1 uppercase tracking-tight group-hover:text-primary-600 transition-colors">{member.name}</h3>
+                  <p className="text-primary-600 font-bold mb-4 uppercase text-xs tracking-widest">{member.role}</p>
+                  <p className="text-gray-600 flex-grow text-sm leading-relaxed">{member.bio}</p>
                 </motion.div>
               ))}
+            </div>
+            <div className="mt-16">
+              <Link href="/our-team" className="inline-flex items-center space-x-3 px-10 py-4 bg-gray-900 text-white font-bold uppercase tracking-widest text-sm hover:bg-primary-600 transition-all shadow-xl">
+                <span>View Full Team</span>
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </section>
