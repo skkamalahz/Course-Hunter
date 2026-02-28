@@ -302,7 +302,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-2xl font-bold mb-1 uppercase tracking-tight group-hover:text-primary-600 transition-colors">{member.name}</h3>
                   <p className="text-primary-600 font-bold mb-6 uppercase text-xs tracking-widest">{member.role}</p>
-                  <p className="text-gray-500 flex-grow text-sm leading-relaxed font-medium line-clamp-4">{member.bio}</p>
+                  <p className="text-gray-500 flex-grow text-sm leading-relaxed font-medium line-clamp-3">{member.bio}</p>
                 </motion.div>
               ))}
             </div>
