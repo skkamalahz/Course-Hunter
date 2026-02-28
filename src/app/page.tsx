@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail, ExternalLink, Briefcase, User } from 'lucide-react';
+import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail, ExternalLink, Briefcase, User, RefreshCw } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
 
@@ -15,7 +15,7 @@ const iconMap: { [key: string]: any } = {
 export default function HomePage() {
   const [hero, setHero] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
-  const [founders, setFounders] = useState<any[]>([]);
+  const [leadership, setLeadership] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,27 +27,25 @@ export default function HomePage() {
           { data: heroData },
           { data: servicesData },
           { data: teamData },
+          { data: catData },
           { data: clientsData },
           { data: portfolioData }
         ] = await Promise.all([
           supabase.from('hero_settings').select('*').single(),
           supabase.from('services').select('*').order('order_index'),
           supabase.from('team_members').select('*').order('order_index'),
+          supabase.from('team_categories').select('*').order('order_index'),
           supabase.from('clients').select('*').order('order_index'),
           supabase.from('portfolio_items').select('*').order('order_index').limit(3)
         ]);
 
         if (heroData) setHero(heroData);
         if (servicesData) setServices(servicesData);
-        if (teamData) {
-          // Filter for Founders or Management for the home page
-          const founderList = teamData.filter(m =>
-            m.category === 'Founder' ||
-            m.category === 'Founders' ||
-            m.role.toLowerCase().includes('founder') ||
-            m.role.toLowerCase().includes('ceo')
-          );
-          setFounders(founderList.length > 0 ? founderList : teamData.slice(0, 3));
+        if (teamData && catData) {
+          // Identify leadership category (usually the first one, or 'Founder')
+          const leaderCat = catData.find(c => c.name === 'Founder' || c.name === 'Founders' || c.order_index === 0);
+          const leaderList = teamData.filter(m => m.category === leaderCat?.name);
+          setLeadership(leaderList.length > 0 ? leaderList : teamData.slice(0, 3));
         }
         if (clientsData) setClients(clientsData);
         if (portfolioData) setPortfolio(portfolioData);
@@ -65,7 +63,7 @@ export default function HomePage() {
     return (
       <PublicLayout>
         <div className="min-h-screen flex items-center justify-center bg-gray-900">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+          <RefreshCw className="animate-spin text-primary-500" size={48} />
         </div>
       </PublicLayout>
     );
@@ -244,22 +242,22 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* Meet the Founders */}
+        {/* Meet the Leadership */}
         <section className="py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-4xl font-black mb-4 uppercase tracking-tighter">Meet the Leadership</h2>
             <div className="h-1.5 w-20 bg-primary-500 mx-auto mb-16"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {founders.map((member, index) => (
+              {leadership.map((member, index) => (
                 <motion.div
                   key={member.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2 }}
-                  className="p-8 bg-white rounded-3xl shadow-xl flex flex-col h-full hover:shadow-2xl transition-all border border-gray-100 group"
+                  className="p-10 bg-white rounded-[2.5rem] shadow-xl flex flex-col h-full hover:shadow-2xl transition-all border border-gray-100 group"
                 >
-                  <div className="aspect-square bg-gray-50 rounded-2xl mb-6 overflow-hidden flex items-center justify-center border-2 border-primary-50 group-hover:border-primary-100 transition-all">
+                  <div className="aspect-square bg-gray-50 rounded-[2rem] mb-8 overflow-hidden flex items-center justify-center border-2 border-primary-50 group-hover:border-primary-100 transition-all">
                     {member.image_url ? (
                       <img src={member.image_url} alt={member.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     ) : (
@@ -267,13 +265,13 @@ export default function HomePage() {
                     )}
                   </div>
                   <h3 className="text-2xl font-bold mb-1 uppercase tracking-tight group-hover:text-primary-600 transition-colors">{member.name}</h3>
-                  <p className="text-primary-600 font-bold mb-4 uppercase text-xs tracking-widest">{member.role}</p>
-                  <p className="text-gray-600 flex-grow text-sm leading-relaxed">{member.bio}</p>
+                  <p className="text-primary-600 font-bold mb-6 uppercase text-xs tracking-widest">{member.role}</p>
+                  <p className="text-gray-500 flex-grow text-sm leading-relaxed font-medium line-clamp-4">{member.bio}</p>
                 </motion.div>
               ))}
             </div>
             <div className="mt-16">
-              <Link href="/our-team" className="inline-flex items-center space-x-3 px-10 py-4 bg-gray-900 text-white font-bold uppercase tracking-widest text-sm hover:bg-primary-600 transition-all shadow-xl">
+              <Link href="/our-team" className="inline-flex items-center space-x-3 px-10 py-5 bg-gray-900 text-white font-bold uppercase tracking-widest text-sm hover:bg-primary-600 transition-all shadow-xl">
                 <span>View Full Team</span>
                 <ArrowRight size={18} />
               </Link>
