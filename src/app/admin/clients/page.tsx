@@ -2,20 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, Save, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, RefreshCw, X, Building2, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Client {
     id: string;
     name: string;
     logo_url?: string;
+    website_url?: string;
     order_index: number;
 }
 
-export default function ClientsManagementPage() {
-    const [loading, setLoading] = useState(true);
+export default function AdminClientsPage() {
     const [clients, setClients] = useState<Client[]>([]);
-    const [newClientName, setNewClientName] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [formData, setFormData] = useState<Partial<Client>>({
+        name: '',
+        logo_url: '',
+        website_url: ''
+    });
 
     useEffect(() => {
         fetchClients();
@@ -36,23 +43,39 @@ export default function ClientsManagementPage() {
         }
     };
 
-    const handleAdd = async () => {
-        if (!newClientName.trim()) return;
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         try {
-            const { data, error } = await supabase
-                .from('clients')
-                .insert([{ name: newClientName.trim(), order_index: clients.length }]);
-
-            if (error) throw error;
-            setNewClientName('');
+            if (editingId) {
+                const { error } = await supabase
+                    .from('clients')
+                    .update(formData)
+                    .eq('id', editingId);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase
+                    .from('clients')
+                    .insert([{ ...formData, order_index: clients.length }]);
+                if (error) throw error;
+            }
+            setShowForm(false);
+            setEditingId(null);
+            setFormData({ name: '', logo_url: '', website_url: '' });
             fetchClients();
         } catch (error) {
-            console.error('Error adding client:', error);
+            console.error('Error saving client:', error);
+            alert('Error saving client: ' + (error as any).message);
         }
     };
 
+    const handleEdit = (client: Client) => {
+        setEditingId(client.id);
+        setFormData(client);
+        setShowForm(true);
+    };
+
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure?')) return;
+        if (!confirm('Are you sure you want to delete this client?')) return;
         try {
             const { error } = await supabase.from('clients').delete().eq('id', id);
             if (error) throw error;
@@ -62,100 +85,126 @@ export default function ClientsManagementPage() {
         }
     };
 
-    const handleUpdateName = async (id: string, name: string) => {
-        const updatedClients = clients.map(c => c.id === id ? { ...c, name } : c);
-        setClients(updatedClients);
-    };
-
-    const saveChanges = async () => {
-        try {
-            // Update all clients sequentially or in a single transaction if supported properly by client,
-            // but here we'll just save the ones that were edited. 
-            // For simplicity, we'll just alert that names are saved locally and user should probably 
-            // have a proper save per item or batch. Let's implement batch update.
-            const updates = clients.map(client => ({
-                id: client.id,
-                name: client.name,
-                order_index: client.order_index
-            }));
-
-            const { error } = await supabase.from('clients').upsert(updates);
-            if (error) throw error;
-            alert('All clients updated successfully!');
-        } catch (error) {
-            console.error('Error saving changes:', error);
-            alert('Error saving changes');
-        }
-    };
-
     if (loading) return <div className="flex justify-center p-20"><RefreshCw className="animate-spin text-primary-600" size={48} /></div>;
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                    Clients Management
-                </h1>
-                <p className="text-gray-600">Manage your client list for the homepage</p>
+        <div className="p-6">
+            <div className="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 className="text-4xl font-bold mb-2">Client Management</h1>
+                    <p className="text-gray-600">Manage your trusted partners and their logos</p>
+                </div>
+                <button
+                    onClick={() => {
+                        setShowForm(true);
+                        setEditingId(null);
+                        setFormData({ name: '', logo_url: '', website_url: '' });
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium flex items-center space-x-2"
+                >
+                    <Plus size={20} />
+                    <span>Add New Client</span>
+                </button>
             </div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="backdrop-blur-xl bg-white/60 border border-white/40 rounded-2xl p-6 shadow-lg mb-6"
-            >
-                <h2 className="text-lg font-semibold mb-4">Add New Client</h2>
-                <div className="flex space-x-2">
-                    <input
-                        type="text"
-                        value={newClientName}
-                        onChange={(e) => setNewClientName(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
-                        className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none"
-                        placeholder="Client Name"
-                    />
-                    <button
-                        onClick={handleAdd}
-                        className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2"
-                    >
-                        <Plus size={20} />
-                        <span>Add</span>
-                    </button>
-                </div>
-            </motion.div>
+            {showForm && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white p-6 rounded-xl shadow-lg mb-8 border border-primary-100"
+                >
+                    <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Client' : 'Add New Client'}</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Client Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    required
+                                    placeholder="e.g. Google"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
+                                <input
+                                    type="text"
+                                    value={formData.logo_url}
+                                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    placeholder="https://example.com/logo.png"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Website URL (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={formData.website_url}
+                                    onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    placeholder="https://client-website.com"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex space-x-4">
+                            <button
+                                type="submit"
+                                className="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all"
+                            >
+                                {editingId ? 'Update Client' : 'Save Client'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowForm(false)}
+                                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </motion.div>
+            )}
 
-            <div className="space-y-3 mb-6">
-                {clients.map((client, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {clients.map((client) => (
                     <motion.div
                         key={client.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="backdrop-blur-xl bg-white/60 border border-white/40 rounded-xl p-4 shadow-lg flex items-center space-x-3"
+                        layout
+                        className="bg-white rounded-xl shadow-lg p-6 group hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center text-center"
                     >
-                        <input
-                            type="text"
-                            value={client.name}
-                            onChange={(e) => handleUpdateName(client.id, e.target.value)}
-                            className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-primary-500 outline-none"
-                        />
-                        <button
-                            onClick={() => handleDelete(client.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                            <Trash2 size={20} />
-                        </button>
+                        <div className="w-20 h-20 mb-4 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 overflow-hidden">
+                            {client.logo_url ? (
+                                <img src={client.logo_url} alt={client.name} className="max-w-full max-h-full object-contain p-2" />
+                            ) : (
+                                <Building2 className="text-gray-300" size={32} />
+                            )}
+                        </div>
+                        <h3 className="text-lg font-bold mb-1">{client.name}</h3>
+                        {client.website_url && (
+                            <a href={client.website_url} target="_blank" rel="noopener noreferrer" className="text-primary-600 text-xs flex items-center space-x-1 hover:underline mb-4">
+                                <span>Visit Website</span>
+                                <ExternalLink size={12} />
+                            </a>
+                        )}
+                        <div className="flex space-x-2 mt-auto">
+                            <button
+                                onClick={() => handleEdit(client)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                                <Edit2 size={16} />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(client.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
                     </motion.div>
                 ))}
             </div>
-
-            <button
-                onClick={saveChanges}
-                className="w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-semibold hover:shadow-xl transition-all flex items-center justify-center space-x-2"
-            >
-                <Save size={20} />
-                <span>Save All Changes</span>
-            </button>
         </div>
     );
 }
