@@ -1,0 +1,26 @@
+[
+    {
+        "id": "1",
+        "title": "E-commerce Platform Redesign",
+        "description": "Complete redesign of a major e-commerce platform focusing on user experience and conversion optimization.",
+        "category": "Web Development",
+        "image": "/uploads/work/placeholder-1.jpg",
+        "link": "#"
+    },
+    {
+        "id": "2",
+        "title": "Brand Identity Design",
+        "description": "Comprehensive brand identity development including logo, color scheme, and brand guidelines.",
+        "category": "Branding",
+        "image": "/uploads/work/placeholder-2.jpg",
+        "link": "#"
+    },
+    {
+        "id": "3",
+        "title": "Social Media Campaign",
+        "description": "Multi-platform social media campaign that increased engagement by 300%.",
+        "category": "Digital Marketing",
+        "image": "/uploads/work/placeholder-3.jpg",
+        "link": "#"
+    }
+]

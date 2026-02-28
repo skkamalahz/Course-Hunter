@@ -1,0 +1,37 @@
+{
+    "hero": {
+        "title": "Your vision, our solution",
+        "subtitle": "360 degree marketing solution provider",
+        "ctaText": "Our Work",
+        "ctaLink": "/our-work"
+    },
+    "about": {
+        "title": "About Course Hunter",
+        "mission": "We are a leading marketing agency dedicated to transforming businesses through innovative digital solutions.",
+        "vision": "To be the most trusted partner for businesses seeking digital transformation and growth.",
+        "values": [
+            "Innovation and creativity",
+            "Client-centric approach",
+            "Excellence in execution",
+            "Continuous learning and improvement"
+        ],
+        "story": "Founded by three visionary entrepreneurs, Course Hunter has grown from a small startup to a full-service marketing agency. Our team of experts combines creativity with data-driven strategies to deliver exceptional results for our clients."
+    },
+    "contact": {
+        "email": "info@coursehunter.com",
+        "phone": "+1 (555) 123-4567",
+        "address": "123 Marketing Street, Digital City, DC 12345",
+        "socialMedia": {
+            "facebook": "#",
+            "twitter": "#",
+            "linkedin": "#",
+            "instagram": "#"
+        }
+    },
+    "clients": [
+        "Client 1",
+        "Client 2",
+        "Client 3",
+        "Client 4"
+    ]
+}

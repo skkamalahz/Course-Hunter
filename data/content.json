@@ -1,0 +1,112 @@
+{
+    "hero": {
+        "title": "Your vision, our solution",
+        "subtitle": "360 degree marketing solution provider",
+        "ctaText": "Get Started",
+        "ctaLink": "/contact-us",
+        "backgroundImage": "/assets/all-images/5-1.png"
+    },
+    "services": [
+        {
+            "id": "1",
+            "title": "SEO",
+            "description": "Boost your online visibility with our expert SEO strategies",
+            "icon": "Search"
+        },
+        {
+            "id": "2",
+            "title": "Social Media Marketing",
+            "description": "Engage your audience across all social platforms",
+            "icon": "Share2"
+        },
+        {
+            "id": "3",
+            "title": "Content Marketing",
+            "description": "Create compelling content that drives results",
+            "icon": "FileText"
+        },
+        {
+            "id": "4",
+            "title": "Email Marketing",
+            "description": "Reach your customers directly with targeted campaigns",
+            "icon": "Mail"
+        },
+        {
+            "id": "5",
+            "title": "PPC Advertising",
+            "description": "Maximize ROI with data-driven paid advertising",
+            "icon": "TrendingUp"
+        },
+        {
+            "id": "6",
+            "title": "Brand Strategy",
+            "description": "Build a powerful brand that resonates with your audience",
+            "icon": "Target"
+        }
+    ],
+    "team": [
+        {
+            "id": "1",
+            "name": "John Doe",
+            "role": "CEO & Founder",
+            "bio": "Visionary leader with 15+ years in digital marketing"
+        },
+        {
+            "id": "2",
+            "name": "Jane Smith",
+            "role": "Creative Director",
+            "bio": "Award-winning creative professional driving innovation"
+        },
+        {
+            "id": "3",
+            "name": "Mike Johnson",
+            "role": "Strategy Head",
+            "bio": "Data-driven strategist delivering measurable results"
+        }
+    ],
+    "clients": [
+        "Tech Corp",
+        "Design Studio",
+        "E-commerce Plus",
+        "StartUp Hub",
+        "Global Brands",
+        "Innovation Labs",
+        "Digital Agency",
+        "Marketing Pro"
+    ],
+    "gallery": [
+        {
+            "id": "1",
+            "type": "image",
+            "src": "/assets/all-images/5-1.png",
+            "title": "Summer Marketing Campaign 2024",
+            "category": "Campaigns",
+            "description": "Successful summer marketing campaign reaching 2M+ audience"
+        },
+        {
+            "id": "2",
+            "type": "image",
+            "src": "/assets/all-images/5.png",
+            "title": "Product Launch Campaign",
+            "category": "Campaigns",
+            "description": "Multi-channel product launch with 300% ROI"
+        },
+        {
+            "id": "3",
+            "type": "image",
+            "src": "/assets/all-images/5-1.png",
+            "title": "Team Building Event 2024",
+            "category": "Culture",
+            "description": "Annual team building and cultural celebration"
+        },
+        {
+            "id": "4",
+            "type": "video",
+            "src": "/assets/all-images/5.png",
+            "videoSrc": "/assets/videos/campaign.mp4",
+            "title": "Brand Campaign Video",
+            "category": "Videos",
+            "description": "Behind the scenes of our latest brand campaign"
+        }
+    ]
+}

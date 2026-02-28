@@ -1,0 +1,35 @@
+[
+    {
+        "id": "1",
+        "name": "Capt. AKM Golam Kibria",
+        "role": "Co-Founder",
+        "bio": "Visionary leader with extensive experience in business strategy and digital transformation.",
+        "image": "/uploads/team/placeholder-1.jpg",
+        "social": {
+            "linkedin": "#",
+            "twitter": "#"
+        }
+    },
+    {
+        "id": "2",
+        "name": "Golam Mortuza",
+        "role": "Co-Founder",
+        "bio": "Expert in digital marketing and brand development with a passion for innovation.",
+        "image": "/uploads/team/placeholder-2.jpg",
+        "social": {
+            "linkedin": "#",
+            "twitter": "#"
+        }
+    },
+    {
+        "id": "3",
+        "name": "Zahirul Islam",
+        "role": "Co-Founder",
+        "bio": "Technical architect specializing in web development and creative solutions.",
+        "image": "/uploads/team/placeholder-3.jpg",
+        "social": {
+            "linkedin": "#",
+            "twitter": "#"
+        }
+    }
+]

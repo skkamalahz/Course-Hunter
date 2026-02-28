@@ -1,0 +1,56 @@
+[
+    {
+        "id": "1",
+        "title": "Business strategy",
+        "description": "We aim to revolutionise marketing sector through cutting-edge technology and exceptional innovative solutions",
+        "icon": "Target"
+    },
+    {
+        "id": "2",
+        "title": "Branding",
+        "description": "Unlocking your brand's potential through data-driven logistics and innovative digital marketing techniques",
+        "icon": "Sparkles"
+    },
+    {
+        "id": "3",
+        "title": "Digital marketing",
+        "description": "Helping businesses in creating brand value, generate leads, drive website traffic and improve customer engagement",
+        "icon": "TrendingUp"
+    },
+    {
+        "id": "4",
+        "title": "Creative design",
+        "description": "Expert designers trained to create visually appealing and functional designs",
+        "icon": "Palette"
+    },
+    {
+        "id": "5",
+        "title": "Organic growth (SEO)",
+        "description": "Focusing on strategies that naturally attract and retain genuine relationships with clients",
+        "icon": "Search"
+    },
+    {
+        "id": "6",
+        "title": "Web development",
+        "description": "Delivering cutting-edge web development solutions that transform your digital presence with enhanced user experience",
+        "icon": "Code"
+    },
+    {
+        "id": "7",
+        "title": "Content writing",
+        "description": "Creating high-quality, informative, and engaging content and helps businesses connect with their target audience on a deeper level",
+        "icon": "PenTool"
+    },
+    {
+        "id": "8",
+        "title": "Social media",
+        "description": "Provides a powerful platform to engage with customers, build brand awareness, and drive sales on multiple social topics",
+        "icon": "Share2"
+    },
+    {
+        "id": "9",
+        "title": "Customer relationship",
+        "description": "Creating long-lasting relationships with clients by understanding their needs and delivering unparalleled experiences",
+        "icon": "Users"
+    }
+]
