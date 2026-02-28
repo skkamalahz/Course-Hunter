@@ -6,8 +6,18 @@ import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
 
+interface TeamMember {
+    id: string;
+    name: string;
+    role: string;
+    bio: string;
+    image_url?: string;
+    category: string;
+    order_index: number;
+}
+
 export default function OurTeamPage() {
-    const [members, setMembers] = useState<any[]>([]);
+    const [members, setMembers] = useState<TeamMember[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -34,7 +44,7 @@ export default function OurTeamPage() {
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(member);
         return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, TeamMember[]>);
 
     if (loading) {
         return (
