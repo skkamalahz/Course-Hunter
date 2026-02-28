@@ -90,12 +90,12 @@ export default function HomePage() {
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-[60vh]">
             <div className="text-center max-w-4xl">
-              <h1 className="text-6xl md:text-8xl font-black mb-8 leading-tight tracking-tighter">
-                <span className="text-white block">
-                  {hero?.title.split(',')[0] || 'Digital'},
+              <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight tracking-tighter text-white">
+                <span className="block">
+                  {hero?.title.split(',')[0]}
                 </span>
                 <span className="text-accent-500 block mt-2">
-                  {hero?.title.split(',')[1]?.trim() || 'Marketing Solutions'}
+                  {hero?.title.split(',')[1]?.trim()}
                 </span>
               </h1>
 
