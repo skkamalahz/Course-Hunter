@@ -130,42 +130,67 @@ export default function HomePage() {
 
         {/* Our Clients */}
         {clients.length > 0 && (
-          <section className="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden text-center border-y border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              <motion.h2
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+          <section className="py-24 bg-white relative overflow-hidden text-center border-y border-gray-100">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary-100 rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-100 rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-2xl md:text-3xl font-black mb-12 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent uppercase tracking-tight"
+                className="inline-block"
               >
-                Our Trusted Clients
-              </motion.h2>
-              <div className="flex flex-wrap justify-center gap-16 items-center">
-                {clients.map((client, index) => (
+                <span className="text-primary-600 font-black text-xs uppercase tracking-[0.3em] mb-4 block">Our Partners</span>
+                <h2 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent uppercase tracking-tight">
+                  Trusted by Industry Leaders
+                </h2>
+              </motion.div>
+            </div>
+
+            {/* Infinite Marquee */}
+            <div className="relative flex overflow-hidden py-10">
+              <motion.div
+                animate={{
+                  x: ["0%", "-50%"],
+                }}
+                transition={{
+                  x: {
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    duration: 40,
+                    ease: "linear",
+                  },
+                }}
+                className="flex flex-none gap-12 pr-12 items-center"
+              >
+                {[...clients, ...clients].map((client, index) => (
                   <motion.div
-                    key={client.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex flex-col items-center group"
+                    key={`${client.id}-${index}`}
+                    className="flex-none"
+                    whileHover={{ y: -5, scale: 1.05 }}
                   >
-                    {client.logo_url ? (
-                      <div className="h-20 w-32 md:h-24 md:w-40 relative flex items-center justify-center">
+                    <div className="bg-white/40 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 h-24 w-40 md:h-32 md:w-56 flex items-center justify-center group transition-all duration-500 hover:shadow-primary-500/10 hover:border-primary-500/20">
+                      {client.logo_url ? (
                         <img
                           src={client.logo_url}
                           alt={client.name}
-                          className="max-h-full max-w-full object-contain grayscale opacity-50 transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                          className="max-h-full max-w-full object-contain grayscale opacity-60 transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-100"
                         />
-                      </div>
-                    ) : (
-                      <span className="text-xl md:text-2xl font-black text-gray-400 grayscale hover:grayscale-0 transition-all duration-300 cursor-default uppercase">
-                        {client.name}
-                      </span>
-                    )}
+                      ) : (
+                        <span className="text-lg md:text-xl font-black text-gray-300 group-hover:text-primary-600 transition-colors uppercase tracking-widest leading-none">
+                          {client.name}
+                        </span>
+                      )}
+                    </div>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
+
+              {/* Fade Overlays */}
+              <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10"></div>
+              <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10"></div>
             </div>
           </section>
         )}
