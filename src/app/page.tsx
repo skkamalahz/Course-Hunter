@@ -302,7 +302,13 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-2xl font-bold mb-1 uppercase tracking-tight group-hover:text-primary-600 transition-colors">{member.name}</h3>
                   <p className="text-primary-600 font-bold mb-6 uppercase text-xs tracking-widest">{member.role}</p>
-                  <p className="text-gray-500 flex-grow text-sm leading-relaxed font-medium line-clamp-3">{member.bio}</p>
+                  <Link
+                    href="/our-team"
+                    className="mt-auto inline-flex items-center justify-center space-x-2 text-primary-600 font-bold text-xs uppercase tracking-widest hover:text-primary-700 transition-colors"
+                  >
+                    <span>View Details</span>
+                    <ArrowRight size={14} />
+                  </Link>
                 </motion.div>
               ))}
             </div>
