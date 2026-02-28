@@ -251,8 +251,12 @@ export default function HomePage() {
                   transition={{ delay: index * 0.2 }}
                   className="p-6 bg-white rounded-3xl shadow-xl flex flex-col h-full"
                 >
-                  <div className="aspect-square bg-gray-100 rounded-2xl mb-6 flex items-center justify-center">
-                    <Users className="text-gray-300" size={64} />
+                  <div className="aspect-square bg-gray-100 rounded-2xl mb-6 overflow-hidden flex items-center justify-center">
+                    {member.image_url ? (
+                      <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Users className="text-gray-300" size={64} />
+                    )}
                   </div>
                   <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
                   <p className="text-primary-600 font-semibold mb-3">{member.role}</p>

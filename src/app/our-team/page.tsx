@@ -1,51 +1,39 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Linkedin, Twitter, RefreshCw } from 'lucide-react';
+import { Users, Mail, Phone, ExternalLink, Linkedin, Twitter, Github, Image as ImageIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
 
-interface TeamMember {
-    id: string;
-    name: string;
-    role: string;
-    bio: string;
-    social?: {
-        linkedin?: string;
-        twitter?: string;
-    };
-}
-
 export default function OurTeamPage() {
-    const [team, setTeam] = useState<TeamMember[]>([]);
+    const [members, setMembers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        async function fetchTeam() {
+            try {
+                const { data, error } = await supabase
+                    .from('team_members')
+                    .select('*')
+                    .order('order_index', { ascending: true });
+
+                if (error) throw error;
+                setMembers(data || []);
+            } catch (error) {
+                console.error('Error fetching team:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
         fetchTeam();
     }, []);
-
-    const fetchTeam = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('team_members')
-                .select('*')
-                .order('order_index', { ascending: true });
-
-            if (error) throw error;
-            setTeam(data || []);
-        } catch (error) {
-            console.error('Error fetching team members:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (
             <PublicLayout>
-                <div className="min-h-screen flex items-center justify-center">
-                    <RefreshCw className="animate-spin text-primary-600" size={48} />
+                <div className="min-h-screen flex items-center justify-center bg-gray-900">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
                 </div>
             </PublicLayout>
         );
@@ -53,65 +41,70 @@ export default function OurTeamPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen pt-20">
-                {/* Hero Section */}
-                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
-                        >
-                            Our Team
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-xl text-gray-600 max-w-3xl mx-auto"
-                        >
-                            Meet the talented individuals who make it all happen
-                        </motion.p>
+            <div className="min-h-screen bg-white">
+                {/* Banner Section */}
+                <section className="relative h-[40vh] flex items-center justify-center bg-primary-900 overflow-hidden">
+                    <div className="absolute inset-0 opacity-20">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                     </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="relative z-10 text-center"
+                    >
+                        <h1 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter">OUR TEAM</h1>
+                        <div className="h-1.5 w-24 bg-accent-500 mx-auto"></div>
+                    </motion.div>
                 </section>
 
-                {/* Team Grid */}
-                <section className="py-20 bg-white">
+                <section className="py-24 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                            {team.map((member, index) => (
+                            {members.map((member, index) => (
                                 <motion.div
                                     key={member.id}
                                     initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
-                                    transition={{ delay: index * 0.15 }}
-                                    className="group"
+                                    transition={{ delay: index * 0.1 }}
+                                    className="group bg-white rounded-[2rem] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
                                 >
-                                    <div className="relative overflow-hidden rounded-2xl mb-6 shadow-lg">
-                                        <div className="aspect-square bg-gradient-to-br from-primary-100 to-accent-100 flex items-center justify-center">
-                                            <div className="w-40 h-40 bg-gradient-to-br from-primary-300 to-accent-300 rounded-full"></div>
-                                        </div>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-8">
-                                            <div className="flex space-x-4">
-                                                <a
-                                                    href={member.social?.linkedin || '#'}
-                                                    className="p-3 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
-                                                >
-                                                    <Linkedin className="text-white" size={24} />
-                                                </a>
-                                                <a
-                                                    href={member.social?.twitter || '#'}
-                                                    className="p-3 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
-                                                >
-                                                    <Twitter className="text-white" size={24} />
-                                                </a>
+                                    <div className="relative aspect-[4/5] overflow-hidden">
+                                        {member.image_url ? (
+                                            <img
+                                                src={member.image_url}
+                                                alt={member.name}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                                <Users className="text-gray-300" size={80} />
                                             </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
+
+                                        <div className="absolute bottom-6 left-6 right-6">
+                                            <h3 className="text-2xl font-bold text-white mb-1">{member.name}</h3>
+                                            <p className="text-accent-400 font-semibold">{member.role}</p>
                                         </div>
                                     </div>
-                                    <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
-                                    <p className="text-primary-600 font-semibold mb-3">{member.role}</p>
-                                    <p className="text-gray-600 leading-relaxed">{member.bio}</p>
+
+                                    <div className="p-8">
+                                        <p className="text-gray-600 leading-relaxed mb-6">
+                                            {member.bio}
+                                        </p>
+                                        <div className="flex space-x-4">
+                                            <a href="#" className="p-2 bg-gray-100 rounded-lg text-gray-600 hover:bg-primary-500 hover:text-white transition-all">
+                                                <Linkedin size={18} />
+                                            </a>
+                                            <a href="#" className="p-2 bg-gray-100 rounded-lg text-gray-600 hover:bg-primary-500 hover:text-white transition-all">
+                                                <Twitter size={18} />
+                                            </a>
+                                            <a href={`mailto:info@coursehunter.com`} className="p-2 bg-gray-100 rounded-lg text-gray-600 hover:bg-primary-500 hover:text-white transition-all">
+                                                <Mail size={18} />
+                                            </a>
+                                        </div>
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>

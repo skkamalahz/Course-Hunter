@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, RefreshCw, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, RefreshCw, X, User } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface TeamMember {
@@ -10,6 +10,7 @@ interface TeamMember {
     name: string;
     role: string;
     bio: string;
+    image_url?: string;
     order_index: number;
 }
 
@@ -17,14 +18,12 @@ export default function AdminTeamPage() {
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
-    const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-    const [saving, setSaving] = useState(false);
-
-    const [formData, setFormData] = useState({
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [formData, setFormData] = useState<Partial<TeamMember>>({
         name: '',
         role: '',
         bio: '',
-        order_index: 0
+        image_url: ''
     });
 
     useEffect(() => {
@@ -32,17 +31,15 @@ export default function AdminTeamPage() {
     }, []);
 
     const fetchMembers = async () => {
-        setLoading(true);
         try {
             const { data, error } = await supabase
                 .from('team_members')
                 .select('*')
-                .order('order_index');
-
+                .order('order_index', { ascending: true });
             if (error) throw error;
             setMembers(data || []);
         } catch (error) {
-            console.error('Error fetching team members:', error);
+            console.error('Error fetching members:', error);
         } finally {
             setLoading(false);
         }
@@ -50,87 +47,65 @@ export default function AdminTeamPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSaving(true);
         try {
-            if (editingMember) {
+            if (editingId) {
                 const { error } = await supabase
                     .from('team_members')
                     .update(formData)
-                    .eq('id', editingMember.id);
+                    .eq('id', editingId);
                 if (error) throw error;
-                alert('Member updated successfully!');
             } else {
                 const { error } = await supabase
                     .from('team_members')
-                    .insert([{ ...formData, order_index: members.length + 1 }]);
+                    .insert([{ ...formData, order_index: members.length }]);
                 if (error) throw error;
-                alert('Member added successfully!');
             }
             setShowForm(false);
-            setEditingMember(null);
-            setFormData({ name: '', role: '', bio: '', order_index: 0 });
+            setEditingId(null);
+            setFormData({ name: '', role: '', bio: '', image_url: '' });
             fetchMembers();
         } catch (error) {
-            console.error('Error saving team member:', error);
-            alert('Failed to save member');
-        } finally {
-            setSaving(false);
+            console.error('Error saving member:', error);
+            alert('Error saving member: ' + (error as any).message);
         }
     };
 
     const handleEdit = (member: TeamMember) => {
-        setEditingMember(member);
-        setFormData({
-            name: member.name,
-            role: member.role,
-            bio: member.bio,
-            order_index: member.order_index
-        });
+        setEditingId(member.id);
+        setFormData(member);
         setShowForm(true);
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this team member?')) return;
+        if (!confirm('Are you sure you want to delete this member?')) return;
         try {
-            const { error } = await supabase
-                .from('team_members')
-                .delete()
-                .eq('id', id);
+            const { error } = await supabase.from('team_members').delete().eq('id', id);
             if (error) throw error;
-            setMembers(members.filter(m => m.id !== id));
+            fetchMembers();
         } catch (error) {
-            console.error('Error deleting team member:', error);
-            alert('Failed to delete member');
+            console.error('Error deleting member:', error);
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <RefreshCw className="animate-spin text-primary-600" size={32} />
-            </div>
-        );
-    }
+    if (loading) return <div className="flex justify-center p-20"><RefreshCw className="animate-spin text-primary-600" size={48} /></div>;
 
     return (
-        <div>
+        <div className="p-6">
             <div className="mb-8 flex justify-between items-center">
                 <div>
-                    <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                        Team Management
-                    </h1>
-                    <p className="text-gray-600">Manage your team members</p>
+                    <h1 className="text-4xl font-bold mb-2">Team Management</h1>
+                    <p className="text-gray-600">Manage your founders and team members</p>
                 </div>
                 <button
                     onClick={() => {
-                        setEditingMember(null);
-                        setFormData({ name: '', role: '', bio: '', order_index: 0 });
-                        setShowForm(!showForm);
+                        setShowForm(true);
+                        setEditingId(null);
+                        setFormData({ name: '', role: '', bio: '', image_url: '' });
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium flex items-center space-x-2"
+                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium flex items-center space-x-2"
                 >
-                    {showForm ? <X size={20} /> : <Plus size={20} />}
-                    <span>{showForm ? 'Close Form' : 'Add Member'}</span>
+                    <Plus size={20} />
+                    <span>Add Member</span>
                 </button>
             </div>
 
@@ -138,56 +113,64 @@ export default function AdminTeamPage() {
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="backdrop-blur-xl bg-white/60 border border-white/40 p-8 rounded-3xl shadow-xl mb-8"
+                    className="bg-white p-6 rounded-xl shadow-lg mb-8"
                 >
-                    <h2 className="text-2xl font-bold mb-6">{editingMember ? 'Edit Team Member' : 'Add New Team Member'}</h2>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                                placeholder="Member's full name"
-                            />
+                    <h2 className="text-2xl font-bold mb-6">{editingId ? 'Edit Member' : 'Add New Member'}</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                                <input
+                                    type="text"
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    required
+                                />
+                            </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
                             <input
                                 type="text"
-                                required
-                                value={formData.role}
-                                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                                placeholder="Job title"
+                                value={formData.image_url}
+                                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                placeholder="https://example.com/photo.jpg"
                             />
+                            <p className="mt-1 text-xs text-gray-500 italic">Enter a public image URL</p>
                         </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Bio</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
                             <textarea
-                                required
-                                rows={3}
+                                rows={4}
                                 value={formData.bio}
                                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                                placeholder="Describe the member's background and expertise"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                required
                             />
                         </div>
-                        <div className="md:col-span-2 flex space-x-4">
+                        <div className="flex space-x-4">
                             <button
                                 type="submit"
-                                disabled={saving}
-                                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl hover:shadow-xl transition-all font-semibold flex items-center space-x-2 disabled:opacity-50"
+                                className="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all"
                             >
-                                {saving ? <RefreshCw className="animate-spin" size={20} /> : <Save size={20} />}
-                                <span>{saving ? 'Saving...' : (editingMember ? 'Update Member' : 'Add Member')}</span>
+                                {editingId ? 'Update' : 'Save'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setShowForm(false)}
-                                className="px-8 py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -196,51 +179,41 @@ export default function AdminTeamPage() {
                 </motion.div>
             )}
 
-            <div className="backdrop-blur-xl bg-white/60 border border-white/40 rounded-3xl shadow-xl overflow-hidden">
-                <table className="w-full">
-                    <thead>
-                        <tr className="bg-gray-50/50">
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Name</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Role</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {members.map((member) => (
-                            <tr key={member.id} className="hover:bg-white/40 transition-colors">
-                                <td className="px-6 py-5">
-                                    <div className="font-bold text-gray-800">{member.name}</div>
-                                </td>
-                                <td className="px-6 py-5">
-                                    <div className="text-primary-600 font-medium">{member.role}</div>
-                                </td>
-                                <td className="px-6 py-5">
-                                    <div className="flex space-x-3">
-                                        <button
-                                            onClick={() => handleEdit(member)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-blue-50"
-                                            title="Edit Member"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(member.id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all border border-red-50"
-                                            title="Delete Member"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {members.length === 0 && (
-                    <div className="p-12 text-center text-gray-500">
-                        No team members found. Add your first member above!
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {members.map((member) => (
+                    <div key={member.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-primary-100">
+                                    {member.image_url ? (
+                                        <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="text-gray-300" size={32} />
+                                    )}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold">{member.name}</h3>
+                                    <p className="text-primary-600 font-medium text-sm">{member.role}</p>
+                                </div>
+                            </div>
+                            <div className="flex space-x-1">
+                                <button
+                                    onClick={() => handleEdit(member)}
+                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                >
+                                    <Edit2 size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(member.id)}
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                        <p className="text-gray-700 text-sm line-clamp-3">{member.bio}</p>
                     </div>
-                )}
+                ))}
             </div>
         </div>
     );

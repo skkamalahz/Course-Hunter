@@ -12,7 +12,9 @@ import {
     Images,
     LogOut,
     Menu,
-    X
+    X,
+    FileText,
+    Settings
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,9 +22,12 @@ const navItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Hero Section', href: '/admin/hero', icon: ImageIcon },
     { name: 'Services', href: '/admin/services', icon: Briefcase },
+    { name: 'Portfolio', href: '/admin/work', icon: FileText },
+    { name: 'Careers', href: '/admin/careers', icon: Building2 },
     { name: 'Team', href: '/admin/team', icon: Users },
     { name: 'Clients', href: '/admin/clients', icon: Building2 },
     { name: 'Gallery', href: '/admin/content-gallery', icon: Images },
+    { name: 'Global Content', href: '/admin/content', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -55,9 +60,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {/* Logo/Header */}
                     <div className="p-6 border-b border-white/10">
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
-                                Admin Panel
-                            </h1>
+                            <Link href="/" className="group">
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
+                                    Admin Panel
+                                </h1>
+                            </Link>
                             <button
                                 onClick={() => setSidebarOpen(false)}
                                 className="lg:hidden text-white"
@@ -69,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 p-4 space-y-2">
+                    <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = pathname === item.href;
@@ -80,15 +87,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                     href={item.href}
                                     onClick={() => setSidebarOpen(false)}
                                     className={`
-                    flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200
+                    flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200
                     ${isActive
-                                            ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg'
+                                            ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg scale-[1.02]'
                                             : 'text-gray-300 hover:bg-white/10 hover:text-white'
                                         }
                   `}
                                 >
-                                    <Icon size={20} />
-                                    <span className="font-medium">{item.name}</span>
+                                    <Icon size={18} />
+                                    <span className="font-medium text-sm">{item.name}</span>
                                 </Link>
                             );
                         })}
@@ -108,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </aside>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
                 {/* Mobile Header */}
                 <header className="lg:hidden sticky top-0 z-30 backdrop-blur-xl bg-white/90 border-b border-gray-200 px-4 py-4">
                     <button
@@ -120,7 +127,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 p-6 lg:p-8">
+                <main className="flex-1 p-4 lg:p-8">
                     {children}
                 </main>
             </div>
