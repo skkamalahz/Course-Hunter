@@ -1,0 +1,48 @@
+
+> course-hunter@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 3.5s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/26) ...
+  Generating static pages using 11 workers (6/26) 
+  Generating static pages using 11 workers (12/26) 
+  Generating static pages using 11 workers (19/26) 
+Γ£ô Generating static pages using 11 workers (26/26) in 961.4ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /about-us
+Γö£ Γùï /admin
+Γö£ Γùï /admin/careers
+Γö£ Γùï /admin/clients
+Γö£ Γùï /admin/content
+Γö£ Γùï /admin/content-gallery
+Γö£ Γùï /admin/dashboard
+Γö£ Γùï /admin/hero
+Γö£ Γùï /admin/login
+Γö£ Γùï /admin/services
+Γö£ Γùï /admin/team
+Γö£ Γùï /admin/work
+Γö£ ╞Æ /api/admin/clients
+Γö£ ╞Æ /api/admin/gallery
+Γö£ ╞Æ /api/admin/hero
+Γö£ ╞Æ /api/admin/services
+Γö£ ╞Æ /api/admin/team
+Γö£ Γùï /career
+Γö£ Γùï /contact-us
+Γö£ Γùï /gallery
+Γö£ Γùï /our-team
+Γöö Γùï /our-work
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
