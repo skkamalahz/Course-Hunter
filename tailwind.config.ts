@@ -43,8 +43,13 @@ const config: Config = {
         'slide-down': 'slideDown 0.6s ease-out',
         'scale-in': 'scaleIn 0.4s ease-out',
         'gradient': 'gradient 8s ease infinite',
+        'marquee': 'marquee 40s linear infinite',
       },
       keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },

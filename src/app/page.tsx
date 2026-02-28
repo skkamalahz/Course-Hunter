@@ -150,28 +150,13 @@ export default function HomePage() {
             </div>
 
             {/* Infinite Marquee */}
-            <div className="relative flex overflow-hidden py-10">
-              <motion.div
-                animate={{
-                  x: ["0%", "-50%"],
-                }}
-                transition={{
-                  x: {
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    duration: 40,
-                    ease: "linear",
-                  },
-                }}
-                className="flex flex-none gap-12 pr-12 items-center"
+            <div className="relative flex overflow-hidden py-10 group/marquee">
+              <div
+                className="flex flex-none gap-12 pr-12 items-center animate-marquee hover:[animation-play-state:paused]"
               >
-                {[...clients, ...clients].map((client, index) => (
-                  <motion.div
-                    key={`${client.id}-${index}`}
-                    className="flex-none"
-                    whileHover={{ y: -5, scale: 1.05 }}
-                  >
-                    <div className="bg-white/40 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 h-24 w-40 md:h-32 md:w-56 flex items-center justify-center group transition-all duration-500 hover:shadow-primary-500/10 hover:border-primary-500/20">
+                {[...clients, ...clients].map((client, index) => {
+                  const LogoContent = (
+                    <div className="bg-white/40 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 h-24 w-40 md:h-32 md:w-56 flex items-center justify-center group transition-all duration-500 hover:shadow-primary-500/10 hover:border-primary-500/20 cursor-pointer">
                       {client.logo_url ? (
                         <img
                           src={client.logo_url}
@@ -184,9 +169,25 @@ export default function HomePage() {
                         </span>
                       )}
                     </div>
-                  </motion.div>
-                ))}
-              </motion.div>
+                  );
+
+                  return (
+                    <motion.div
+                      key={`${client.id}-${index}`}
+                      className="flex-none"
+                      whileHover={{ y: -5, scale: 1.05 }}
+                    >
+                      {client.website_url ? (
+                        <a href={client.website_url} target="_blank" rel="noopener noreferrer">
+                          {LogoContent}
+                        </a>
+                      ) : (
+                        LogoContent
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
 
               {/* Fade Overlays */}
               <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10"></div>
