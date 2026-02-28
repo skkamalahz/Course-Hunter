@@ -140,7 +140,7 @@ export default function HomePage() {
               >
                 Our Trusted Clients
               </motion.h2>
-              <div className="flex flex-wrap justify-center gap-12 items-center">
+              <div className="flex flex-wrap justify-center gap-16 items-center">
                 {clients.map((client, index) => (
                   <motion.div
                     key={client.id}
@@ -148,10 +148,21 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
+                    className="flex flex-col items-center group"
                   >
-                    <span className="text-xl md:text-2xl font-black text-gray-400 grayscale hover:grayscale-0 transition-all duration-300 cursor-default uppercase">
-                      {client.name}
-                    </span>
+                    {client.logo_url ? (
+                      <div className="h-20 w-32 md:h-24 md:w-40 relative flex items-center justify-center">
+                        <img
+                          src={client.logo_url}
+                          alt={client.name}
+                          className="max-h-full max-w-full object-contain grayscale opacity-50 transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-xl md:text-2xl font-black text-gray-400 grayscale hover:grayscale-0 transition-all duration-300 cursor-default uppercase">
+                        {client.name}
+                      </span>
+                    )}
                   </motion.div>
                 ))}
               </div>

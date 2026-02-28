@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Save, RefreshCw, X, Building2, ExternalLink } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, RefreshCw, X, Building2, ExternalLink, Upload, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Client {
@@ -18,6 +18,8 @@ export default function AdminClientsPage() {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+
     const [formData, setFormData] = useState<Partial<Client>>({
         name: '',
         logo_url: '',
@@ -29,6 +31,7 @@ export default function AdminClientsPage() {
     }, []);
 
     const fetchClients = async () => {
+        setLoading(true);
         try {
             const { data, error } = await supabase
                 .from('clients')
@@ -40,6 +43,35 @@ export default function AdminClientsPage() {
             console.error('Error fetching clients:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `client-${Math.random()}.${fileExt}`;
+            const filePath = `client-logos/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('team-images') // Using the same bucket we created for team photos
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('team-images')
+                .getPublicUrl(filePath);
+
+            setFormData(prev => ({ ...prev, logo_url: publicUrl }));
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Error uploading image. Please check your connection.');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -92,7 +124,7 @@ export default function AdminClientsPage() {
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="text-4xl font-bold mb-2">Client Management</h1>
-                    <p className="text-gray-600">Manage your trusted partners and their logos</p>
+                    <p className="text-gray-600">Showcase your trusted partners with logos</p>
                 </div>
                 <button
                     onClick={() => {
@@ -128,13 +160,27 @@ export default function AdminClientsPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Client Logo</label>
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-12 h-12 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        {formData.logo_url ? (
+                                            <img src={formData.logo_url} className="w-full h-full object-contain p-1" alt="Logo Preview" />
+                                        ) : (
+                                            <ImageIcon className="text-gray-300" size={24} />
+                                        )}
+                                    </div>
+                                    <label className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-400 hover:bg-primary-50 transition-all group">
+                                        <div className="flex items-center space-x-2 text-gray-500 group-hover:text-primary-600">
+                                            {uploading ? <RefreshCw className="animate-spin" size={18} /> : <Upload size={18} />}
+                                            <span className="text-sm font-medium">{uploading ? 'Uploading...' : 'Upload Logo'}</span>
+                                        </div>
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                    </label>
+                                </div>
                                 <input
-                                    type="text"
+                                    type="hidden"
                                     value={formData.logo_url}
-                                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                    placeholder="https://example.com/logo.png"
+                                    required
                                 />
                             </div>
                             <div>
@@ -148,17 +194,18 @@ export default function AdminClientsPage() {
                                 />
                             </div>
                         </div>
-                        <div className="flex space-x-4">
+                        <div className="flex space-x-4 pt-4 border-t border-gray-50">
                             <button
                                 type="submit"
-                                className="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all"
+                                className="px-8 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all font-bold"
+                                disabled={uploading}
                             >
                                 {editingId ? 'Update Client' : 'Save Client'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setShowForm(false)}
-                                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                                className="px-8 py-2.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors font-bold"
                             >
                                 Cancel
                             </button>
@@ -167,39 +214,39 @@ export default function AdminClientsPage() {
                 </motion.div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {clients.map((client) => (
                     <motion.div
                         key={client.id}
                         layout
-                        className="bg-white rounded-xl shadow-lg p-6 group hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center text-center"
+                        className="bg-white rounded-2xl shadow-lg p-8 group hover:shadow-2xl transition-all border border-transparent hover:border-primary-50 flex flex-col items-center text-center relative"
                     >
-                        <div className="w-20 h-20 mb-4 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 overflow-hidden">
+                        <div className="w-24 h-24 mb-6 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 overflow-hidden shadow-inner group-hover:scale-105 transition-transform">
                             {client.logo_url ? (
-                                <img src={client.logo_url} alt={client.name} className="max-w-full max-h-full object-contain p-2" />
+                                <img src={client.logo_url} alt={client.name} className="max-w-full max-h-full object-contain p-4 transition-all group-hover:grayscale-0" />
                             ) : (
-                                <Building2 className="text-gray-300" size={32} />
+                                <Building2 className="text-gray-300" size={40} />
                             )}
                         </div>
-                        <h3 className="text-lg font-bold mb-1">{client.name}</h3>
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary-700 transition-colors uppercase tracking-tight">{client.name}</h3>
                         {client.website_url && (
-                            <a href={client.website_url} target="_blank" rel="noopener noreferrer" className="text-primary-600 text-xs flex items-center space-x-1 hover:underline mb-4">
-                                <span>Visit Website</span>
+                            <a href={client.website_url} target="_blank" rel="noopener noreferrer" className="text-primary-600 text-xs font-bold flex items-center space-x-1 hover:underline mb-6 uppercase tracking-widest">
+                                <span>Visit Site</span>
                                 <ExternalLink size={12} />
                             </a>
                         )}
-                        <div className="flex space-x-2 mt-auto">
+                        <div className="flex space-x-3 mt-auto opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                                 onClick={() => handleEdit(client)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
                             >
-                                <Edit2 size={16} />
+                                <Edit2 size={18} />
                             </button>
                             <button
                                 onClick={() => handleDelete(client.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                             >
-                                <Trash2 size={16} />
+                                <Trash2 size={18} />
                             </button>
                         </div>
                     </motion.div>
