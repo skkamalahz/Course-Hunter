@@ -1,11 +1,56 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import teamData from '@/data/team.json';
-import { Linkedin, Twitter } from 'lucide-react';
+import { Linkedin, Twitter, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
+import { supabase } from '@/lib/supabase';
+
+interface TeamMember {
+    id: string;
+    name: string;
+    role: string;
+    bio: string;
+    social?: {
+        linkedin?: string;
+        twitter?: string;
+    };
+}
 
 export default function OurTeamPage() {
+    const [team, setTeam] = useState<TeamMember[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchTeam();
+    }, []);
+
+    const fetchTeam = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('team_members')
+                .select('*')
+                .order('order_index', { ascending: true });
+
+            if (error) throw error;
+            setTeam(data || []);
+        } catch (error) {
+            console.error('Error fetching team members:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <PublicLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <RefreshCw className="animate-spin text-primary-600" size={48} />
+                </div>
+            </PublicLayout>
+        );
+    }
+
     return (
         <PublicLayout>
             <div className="min-h-screen pt-20">
@@ -34,7 +79,7 @@ export default function OurTeamPage() {
                 <section className="py-20 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                            {teamData.map((member, index) => (
+                            {team.map((member, index) => (
                                 <motion.div
                                     key={member.id}
                                     initial={{ opacity: 0, y: 30 }}
@@ -50,13 +95,13 @@ export default function OurTeamPage() {
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-8">
                                             <div className="flex space-x-4">
                                                 <a
-                                                    href={member.social.linkedin}
+                                                    href={member.social?.linkedin || '#'}
                                                     className="p-3 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
                                                 >
                                                     <Linkedin className="text-white" size={24} />
                                                 </a>
                                                 <a
-                                                    href={member.social.twitter}
+                                                    href={member.social?.twitter || '#'}
                                                     className="p-3 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
                                                 >
                                                     <Twitter className="text-white" size={24} />

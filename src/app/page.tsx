@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, FileText, Mail } from 'lucide-react';
+import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, FileText, Mail, ExternalLink, Briefcase } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
 
@@ -16,6 +16,8 @@ export default function HomePage() {
   const [hero, setHero] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [team, setTeam] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,16 +26,22 @@ export default function HomePage() {
         const [
           { data: heroData },
           { data: servicesData },
-          { data: teamData }
+          { data: teamData },
+          { data: clientsData },
+          { data: portfolioData }
         ] = await Promise.all([
           supabase.from('hero_settings').select('*').single(),
           supabase.from('services').select('*').order('order_index'),
-          supabase.from('team_members').select('*').order('order_index')
+          supabase.from('team_members').select('*').order('order_index'),
+          supabase.from('clients').select('*').order('order_index'),
+          supabase.from('portfolio_items').select('*').order('order_index').limit(3)
         ]);
 
         if (heroData) setHero(heroData);
         if (servicesData) setServices(servicesData);
         if (teamData) setTeam(teamData);
+        if (clientsData) setClients(clientsData);
+        if (portfolioData) setPortfolio(portfolioData);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -59,7 +67,6 @@ export default function HomePage() {
       <div className="min-h-screen">
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-          {/* Background Image with Blur */}
           <div className="absolute inset-0">
             <Image
               src={hero?.background_image || "/assets/all-images/5-1.png"}
@@ -69,11 +76,8 @@ export default function HomePage() {
               style={{ filter: 'blur(3px)', transform: 'scale(1.1)' }}
               priority
             />
-            {/* Professional Overlay System - Branded Colors */}
             <div className="absolute inset-0 bg-gradient-to-r from-black via-primary-500/40 to-transparent z-10"></div>
             <div className="absolute inset-0 bg-primary-500/20 z-10"></div>
-
-            {/* Subtle Texture/Grain Overlay for premium feel */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
           </div>
 
@@ -110,7 +114,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Scroll Indicator - Simplified */}
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
             <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
               <div className="w-1 h-3 bg-white/50 rounded-full mt-2"></div>
@@ -119,32 +122,33 @@ export default function HomePage() {
         </section>
 
         {/* Our Clients */}
-        <section className="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent"
-            >
-              Our clients
-            </motion.h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-              {['Tech Corp', 'Design Studio', 'E-commerce Plus', 'StartUp Hub'].map((client, index) => (
-                <motion.div
-                  key={client}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex justify-center"
-                >
-                  <span className="text-2xl font-bold text-gray-400 grayscale hover:grayscale-0 transition-all duration-300">{client}</span>
-                </motion.div>
-              ))}
+        {clients.length > 0 && (
+          <section className="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden text-center">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <motion.h2
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="text-3xl md:text-4xl font-bold mb-12 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent"
+              >
+                Our clients
+              </motion.h2>
+              <div className="flex flex-wrap justify-center gap-12 items-center">
+                {clients.map((client, index) => (
+                  <motion.div
+                    key={client.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <span className="text-2xl font-bold text-gray-400 grayscale hover:grayscale-0 transition-all duration-300">{client.name}</span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Services Overview */}
         <section className="py-24 bg-white relative">
@@ -180,8 +184,61 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Latest Work Preview */}
+        {portfolio.length > 0 && (
+          <section className="py-24 bg-gray-900 text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-end mb-16">
+                <div>
+                  <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">Latest Work</h2>
+                  <p className="text-gray-400 max-w-2xl">Handpicked projects that showcase our expertise and impact.</p>
+                </div>
+                <Link href="/our-work" className="hidden md:flex items-center space-x-2 text-accent-500 font-bold group">
+                  <span>View All Projects</span>
+                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                </Link>
+              </div>
+              <div className="grid md:grid-cols-3 gap-8">
+                {portfolio.map((project, index) => (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group"
+                  >
+                    <div className="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                      {project.image_url ? (
+                        <img src={project.image_url} alt={project.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary-900 to-black flex items-center justify-center">
+                          <Briefcase className="text-primary-500/20" size={64} />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <Link href={project.link || '#'} className="p-4 bg-white rounded-full text-primary-900">
+                          <ExternalLink size={24} />
+                        </Link>
+                      </div>
+                    </div>
+                    <span className="text-accent-500 font-bold text-sm uppercase tracking-widest">{project.category}</span>
+                    <h3 className="text-2xl font-bold mt-2 group-hover:text-accent-500 transition-colors">{project.title}</h3>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-12 text-center md:hidden">
+                <Link href="/our-work" className="inline-flex items-center space-x-2 text-accent-500 font-bold">
+                  <span>View All Projects</span>
+                  <ArrowRight size={20} />
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Meet the Founders */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-4xl font-bold text-center mb-16">Meet the Founders</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -192,14 +249,14 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2 }}
-                  className="p-6 bg-white rounded-3xl shadow-xl"
+                  className="p-6 bg-white rounded-3xl shadow-xl flex flex-col h-full"
                 >
                   <div className="aspect-square bg-gray-100 rounded-2xl mb-6 flex items-center justify-center">
                     <Users className="text-gray-300" size={64} />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
                   <p className="text-primary-600 font-semibold mb-3">{member.role}</p>
-                  <p className="text-gray-600">{member.bio}</p>
+                  <p className="text-gray-600 flex-grow">{member.bio}</p>
                 </motion.div>
               ))}
             </div>

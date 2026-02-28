@@ -1,131 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { X, ZoomIn, ArrowLeft, ArrowRight, Play, Film } from 'lucide-react';
+import { X, ZoomIn, ArrowLeft, ArrowRight, Play, Film, RefreshCw } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
-// Gallery data - campaign photos, cultural events, and videos
-const galleryItems = [
-    // Campaign Photos
-    {
-        id: 1,
-        type: 'image' as const,
-        src: '/assets/all-images/5-1.png',
-        title: 'Summer Marketing Campaign 2024',
-        category: 'Campaigns',
-        description: 'Successful summer marketing campaign reaching 2M+ audience'
-    },
-    {
-        id: 2,
-        type: 'image' as const,
-        src: '/assets/all-images/5.png',
-        title: 'Product Launch Campaign',
-        category: 'Campaigns',
-        description: 'Multi-channel product launch with 300% ROI'
-    },
-    {
-        id: 3,
-        type: 'image' as const,
-        src: '/assets/all-images/5-1.png',
-        title: 'Social Media Campaign',
-        category: 'Campaigns',
-        description: 'Viral social media campaign with 5M+ impressions'
-    },
-    {
-        id: 4,
-        type: 'image' as const,
-        src: '/assets/all-images/5.png',
-        title: 'Digital Marketing Excellence',
-        category: 'Campaigns',
-        description: 'Award-winning digital marketing strategy'
-    },
-
-    // Cultural Events
-    {
-        id: 5,
-        type: 'image' as const,
-        src: '/assets/all-images/5-1.png',
-        title: 'Team Building Event 2024',
-        category: 'Culture',
-        description: 'Annual team building and cultural celebration'
-    },
-    {
-        id: 6,
-        type: 'image' as const,
-        src: '/assets/all-images/5.png',
-        title: 'Company Anniversary Celebration',
-        category: 'Culture',
-        description: 'Celebrating 5 years of excellence and innovation'
-    },
-    {
-        id: 7,
-        type: 'image' as const,
-        src: '/assets/all-images/5-1.png',
-        title: 'Workshop & Training Session',
-        category: 'Culture',
-        description: 'Professional development and skill enhancement program'
-    },
-    {
-        id: 8,
-        type: 'image' as const,
-        src: '/assets/all-images/5.png',
-        title: 'Festive Celebration',
-        category: 'Culture',
-        description: 'Cultural festival celebration with team'
-    },
-    {
-        id: 9,
-        type: 'image' as const,
-        src: '/assets/all-images/5-1.png',
-        title: 'Community Outreach',
-        category: 'Culture',
-        description: 'Giving back to our community through various initiatives'
-    },
-
-    // Videos
-    {
-        id: 10,
-        type: 'video' as const,
-        src: '/assets/all-images/5.png', // Placeholder for video thumbnail
-        videoSrc: '/assets/videos/campaign.mp4', // Replace with actual video path
-        title: 'Brand Campaign Video',
-        category: 'Videos',
-        description: 'Behind the scenes of our latest brand campaign'
-    },
-    {
-        id: 11,
-        type: 'video' as const,
-        src: '/assets/all-images/5-1.png',
-        videoSrc: '/assets/videos/culture.mp4',
-        title: 'Company Culture Video',
-        category: 'Videos',
-        description: 'A day in the life at Course Hunter'
-    },
-    {
-        id: 12,
-        type: 'video' as const,
-        src: '/assets/all-images/5.png',
-        videoSrc: '/assets/videos/event.mp4',
-        title: 'Event Highlights',
-        category: 'Videos',
-        description: 'Highlights from our annual company event'
-    },
-];
+interface GalleryItem {
+    id: string;
+    type: 'image' | 'video';
+    src: string;
+    video_src?: string;
+    title: string;
+    category: string;
+    description: string;
+}
 
 const categories = ['All', 'Campaigns', 'Culture', 'Videos'];
 
 export default function GalleryPage() {
+    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [selectedItem, setSelectedItem] = useState<typeof galleryItems[0] | null>(null);
+    const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        fetchGallery();
+    }, []);
+
+    const fetchGallery = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('gallery_items')
+                .select('*')
+                .order('order_index', { ascending: true });
+
+            if (error) throw error;
+            setGalleryItems(data || []);
+        } catch (error) {
+            console.error('Error fetching gallery:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const filteredItems = selectedCategory === 'All'
         ? galleryItems
         : galleryItems.filter(item => item.category === selectedCategory);
 
-    const openLightbox = (item: typeof galleryItems[0], index: number) => {
+    const openLightbox = (item: GalleryItem, index: number) => {
         setSelectedItem(item);
         setCurrentIndex(index);
     };
@@ -141,6 +66,16 @@ export default function GalleryPage() {
         setCurrentIndex(newIndex);
         setSelectedItem(filteredItems[newIndex]);
     };
+
+    if (loading) {
+        return (
+            <PublicLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <RefreshCw className="animate-spin text-primary-600" size={48} />
+                </div>
+            </PublicLayout>
+        );
+    }
 
     return (
         <PublicLayout>
@@ -183,8 +118,8 @@ export default function GalleryPage() {
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => setSelectedCategory(category)}
                                     className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${selectedCategory === category
-                                            ? 'backdrop-blur-xl bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-xl border border-white/40'
-                                            : 'backdrop-blur-xl bg-white/60 border border-white/40 text-gray-700 hover:bg-white/80'
+                                        ? 'backdrop-blur-xl bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-xl border border-white/40'
+                                        : 'backdrop-blur-xl bg-white/60 border border-white/40 text-gray-700 hover:bg-white/80'
                                         }`}
                                 >
                                     {category}
@@ -210,15 +145,10 @@ export default function GalleryPage() {
                                         className="group relative cursor-pointer"
                                         onClick={() => openLightbox(item, index)}
                                     >
-                                        {/* 3D Glass Card */}
                                         <div className="relative backdrop-blur-xl bg-white/60 border border-white/40 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden">
-                                            {/* Glass shine effect */}
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-
-                                            {/* 3D glow effect */}
                                             <div className="absolute -inset-1 bg-gradient-to-r from-primary-400 to-accent-400 opacity-0 group-hover:opacity-30 blur-2xl transition-opacity duration-300"></div>
 
-                                            {/* Image/Video Container */}
                                             <div className="relative aspect-[4/3] overflow-hidden">
                                                 <Image
                                                     src={item.src}
@@ -227,7 +157,6 @@ export default function GalleryPage() {
                                                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />
 
-                                                {/* Video Play Icon Overlay */}
                                                 {item.type === 'video' && (
                                                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
                                                         <motion.div
@@ -239,7 +168,6 @@ export default function GalleryPage() {
                                                     </div>
                                                 )}
 
-                                                {/* Hover Overlay */}
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-6 z-10">
                                                     <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                                         {item.type === 'video' ? (
@@ -257,14 +185,13 @@ export default function GalleryPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Card Content */}
                                             <div className="p-6 relative z-10">
                                                 <div className="flex items-center gap-2 mb-3">
                                                     <div className={`inline-block px-3 py-1 backdrop-blur-sm border rounded-full text-sm font-semibold ${item.category === 'Campaigns'
-                                                            ? 'bg-primary-500/20 border-primary-300/40 text-primary-700'
-                                                            : item.category === 'Culture'
-                                                                ? 'bg-accent-500/20 border-accent-300/40 text-accent-700'
-                                                                : 'bg-purple-500/20 border-purple-300/40 text-purple-700'
+                                                        ? 'bg-primary-500/20 border-primary-300/40 text-primary-700'
+                                                        : item.category === 'Culture'
+                                                            ? 'bg-accent-500/20 border-accent-300/40 text-accent-700'
+                                                            : 'bg-purple-500/20 border-purple-300/40 text-purple-700'
                                                         }`}>
                                                         {item.category}
                                                     </div>
@@ -300,7 +227,6 @@ export default function GalleryPage() {
                             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
                             onClick={closeLightbox}
                         >
-                            {/* Close Button */}
                             <motion.button
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -313,7 +239,6 @@ export default function GalleryPage() {
                                 <X size={24} />
                             </motion.button>
 
-                            {/* Navigation Buttons */}
                             <motion.button
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -344,7 +269,6 @@ export default function GalleryPage() {
                                 <ArrowRight size={24} />
                             </motion.button>
 
-                            {/* Media Container */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -359,9 +283,9 @@ export default function GalleryPage() {
                                             controls
                                             autoPlay
                                             className="w-full h-full object-contain bg-black"
-                                            src={selectedItem.videoSrc}
+                                            src={selectedItem.video_src}
                                         >
-                                            <source src={selectedItem.videoSrc} type="video/mp4" />
+                                            <source src={selectedItem.video_src} type="video/mp4" />
                                             Your browser does not support the video tag.
                                         </video>
                                     ) : (
@@ -376,10 +300,10 @@ export default function GalleryPage() {
                                 <div className="p-6 backdrop-blur-xl bg-white/10">
                                     <div className="flex items-center gap-2 mb-3">
                                         <div className={`inline-block px-3 py-1 backdrop-blur-sm border rounded-full text-sm font-semibold ${selectedItem.category === 'Campaigns'
-                                                ? 'bg-primary-500/30 border-primary-300/40 text-white'
-                                                : selectedItem.category === 'Culture'
-                                                    ? 'bg-accent-500/30 border-accent-300/40 text-white'
-                                                    : 'bg-purple-500/30 border-purple-300/40 text-white'
+                                            ? 'bg-primary-500/30 border-primary-300/40 text-white'
+                                            : selectedItem.category === 'Culture'
+                                                ? 'bg-accent-500/30 border-accent-300/40 text-white'
+                                                : 'bg-purple-500/30 border-purple-300/40 text-white'
                                             }`}>
                                             {selectedItem.category}
                                         </div>

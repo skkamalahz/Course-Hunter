@@ -3,11 +3,19 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Trash2, Save, RefreshCw } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Client {
+    id: string;
+    name: string;
+    logo_url?: string;
+    order_index: number;
+}
 
 export default function ClientsManagementPage() {
     const [loading, setLoading] = useState(true);
-    const [clients, setClients] = useState<string[]>([]);
-    const [newClient, setNewClient] = useState('');
+    const [clients, setClients] = useState<Client[]>([]);
+    const [newClientName, setNewClientName] = useState('');
 
     useEffect(() => {
         fetchClients();
@@ -15,9 +23,12 @@ export default function ClientsManagementPage() {
 
     const fetchClients = async () => {
         try {
-            const res = await fetch('/api/admin/clients');
-            const data = await res.json();
-            setClients(data);
+            const { data, error } = await supabase
+                .from('clients')
+                .select('*')
+                .order('order_index', { ascending: true });
+            if (error) throw error;
+            setClients(data || []);
         } catch (error) {
             console.error('Error fetching clients:', error);
         } finally {
@@ -25,55 +36,69 @@ export default function ClientsManagementPage() {
         }
     };
 
-    const handleSave = async () => {
+    const handleAdd = async () => {
+        if (!newClientName.trim()) return;
         try {
-            await fetch('/api/admin/clients', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(clients)
-            });
-            alert('Clients updated successfully!');
+            const { data, error } = await supabase
+                .from('clients')
+                .insert([{ name: newClientName.trim(), order_index: clients.length }]);
+
+            if (error) throw error;
+            setNewClientName('');
+            fetchClients();
         } catch (error) {
-            console.error('Error saving clients:', error);
-            alert('Failed to save changes');
+            console.error('Error adding client:', error);
         }
     };
 
-    const handleAdd = () => {
-        if (newClient.trim()) {
-            setClients([...clients, newClient.trim()]);
-            setNewClient('');
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure?')) return;
+        try {
+            const { error } = await supabase.from('clients').delete().eq('id', id);
+            if (error) throw error;
+            fetchClients();
+        } catch (error) {
+            console.error('Error deleting client:', error);
         }
     };
 
-    const handleDelete = (index: number) => {
-        setClients(clients.filter((_, i) => i !== index));
+    const handleUpdateName = async (id: string, name: string) => {
+        const updatedClients = clients.map(c => c.id === id ? { ...c, name } : c);
+        setClients(updatedClients);
     };
 
-    const handleUpdate = (index: number, value: string) => {
-        const updated = [...clients];
-        updated[index] = value;
-        setClients(updated);
+    const saveChanges = async () => {
+        try {
+            // Update all clients sequentially or in a single transaction if supported properly by client,
+            // but here we'll just save the ones that were edited. 
+            // For simplicity, we'll just alert that names are saved locally and user should probably 
+            // have a proper save per item or batch. Let's implement batch update.
+            const updates = clients.map(client => ({
+                id: client.id,
+                name: client.name,
+                order_index: client.order_index
+            }));
+
+            const { error } = await supabase.from('clients').upsert(updates);
+            if (error) throw error;
+            alert('All clients updated successfully!');
+        } catch (error) {
+            console.error('Error saving changes:', error);
+            alert('Error saving changes');
+        }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <RefreshCw className="animate-spin text-primary-600" size={32} />
-            </div>
-        );
-    }
+    if (loading) return <div className="flex justify-center p-20"><RefreshCw className="animate-spin text-primary-600" size={48} /></div>;
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto p-6">
             <div className="mb-8">
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                     Clients Management
                 </h1>
-                <p className="text-gray-600">Manage your client list</p>
+                <p className="text-gray-600">Manage your client list for the homepage</p>
             </div>
 
-            {/* Add New Client */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -83,8 +108,8 @@ export default function ClientsManagementPage() {
                 <div className="flex space-x-2">
                     <input
                         type="text"
-                        value={newClient}
-                        onChange={(e) => setNewClient(e.target.value)}
+                        value={newClientName}
+                        onChange={(e) => setNewClientName(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
                         className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none"
                         placeholder="Client Name"
@@ -99,11 +124,10 @@ export default function ClientsManagementPage() {
                 </div>
             </motion.div>
 
-            {/* Clients List */}
             <div className="space-y-3 mb-6">
                 {clients.map((client, index) => (
                     <motion.div
-                        key={index}
+                        key={client.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
@@ -111,12 +135,12 @@ export default function ClientsManagementPage() {
                     >
                         <input
                             type="text"
-                            value={client}
-                            onChange={(e) => handleUpdate(index, e.target.value)}
+                            value={client.name}
+                            onChange={(e) => handleUpdateName(client.id, e.target.value)}
                             className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-primary-500 outline-none"
                         />
                         <button
-                            onClick={() => handleDelete(index)}
+                            onClick={() => handleDelete(client.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                             <Trash2 size={20} />
@@ -126,7 +150,7 @@ export default function ClientsManagementPage() {
             </div>
 
             <button
-                onClick={handleSave}
+                onClick={saveChanges}
                 className="w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-semibold hover:shadow-xl transition-all flex items-center justify-center space-x-2"
             >
                 <Save size={20} />
