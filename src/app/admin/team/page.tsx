@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Save, RefreshCw, X, User, ArrowUp, ArrowDown, Upload, Image as ImageIcon, Linkedin, Twitter, Mail } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, RefreshCw, X, User, ArrowUp, ArrowDown, Upload, Image as ImageIcon, Linkedin, Twitter, Mail, Facebook, Instagram, Youtube, Globe, Github } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface TeamMember {
@@ -16,6 +16,7 @@ interface TeamMember {
     linkedin_url?: string;
     twitter_url?: string;
     mail_url?: string;
+    social_links?: Array<{ platform: string, url: string }>;
 }
 
 interface Category {
@@ -41,7 +42,8 @@ export default function AdminTeamPage() {
         category: 'Team',
         linkedin_url: '',
         twitter_url: '',
-        mail_url: ''
+        mail_url: '',
+        social_links: []
     });
 
     const [newCategoryName, setNewCategoryName] = useState('');
@@ -136,7 +138,8 @@ export default function AdminTeamPage() {
                 category: categories[0]?.name || 'Team',
                 linkedin_url: '',
                 twitter_url: '',
-                mail_url: ''
+                mail_url: '',
+                social_links: []
             });
             fetchMembers();
         } catch (error) {
@@ -248,12 +251,12 @@ export default function AdminTeamPage() {
                                 category: categories[0]?.name || 'Team',
                                 linkedin_url: '',
                                 twitter_url: '',
-                                mail_url: ''
+                                mail_url: '',
+                                social_links: []
                             });
                         }}
                         className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center space-x-2"
                     >
-                        <Plus size={20} />
                         <span>Add Member</span>
                     </button>
                 </div>
@@ -369,43 +372,80 @@ export default function AdminTeamPage() {
                                 />
                             </div>
 
-                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-100 pt-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                        <Linkedin size={14} className="text-blue-600" /> LinkedIn URL
-                                    </label>
-                                    <input
-                                        type="url"
-                                        value={formData.linkedin_url}
-                                        onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                        placeholder="https://linkedin.com/in/..."
-                                    />
+                            <div className="md:col-span-2 border-t border-gray-100 pt-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-bold flex items-center gap-2">
+                                        <Globe size={20} className="text-primary-600" />
+                                        Social Media Links
+                                    </h3>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData({
+                                            ...formData,
+                                            social_links: [...(formData.social_links || []), { platform: 'Facebook', url: '' }]
+                                        })}
+                                        className="text-sm px-3 py-1 bg-primary-50 text-primary-700 rounded-md hover:bg-primary-100 transition-colors flex items-center gap-1"
+                                    >
+                                        <Plus size={14} /> Add Social Link
+                                    </button>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                        <Twitter size={14} className="text-sky-500" /> Twitter URL
-                                    </label>
-                                    <input
-                                        type="url"
-                                        value={formData.twitter_url}
-                                        onChange={(e) => setFormData({ ...formData, twitter_url: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                        placeholder="https://twitter.com/..."
-                                    />
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {(formData.social_links || []).map((link, idx) => (
+                                        <div key={idx} className="flex gap-2 items-end bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                            <div className="flex-shrink-0 w-32">
+                                                <label className="block text-xs font-medium text-gray-500 mb-1">Platform</label>
+                                                <select
+                                                    value={link.platform}
+                                                    onChange={(e) => {
+                                                        const newLinks = [...(formData.social_links || [])];
+                                                        newLinks[idx].platform = e.target.value;
+                                                        setFormData({ ...formData, social_links: newLinks });
+                                                    }}
+                                                    className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary-500 outline-none"
+                                                >
+                                                    <option value="Facebook">Facebook</option>
+                                                    <option value="Instagram">Instagram</option>
+                                                    <option value="Youtube">YouTube</option>
+                                                    <option value="LinkedIn">LinkedIn</option>
+                                                    <option value="Twitter">Twitter/X</option>
+                                                    <option value="Github">GitHub</option>
+                                                    <option value="Website">Website</option>
+                                                    <option value="Mail">Mail</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-medium text-gray-500 mb-1">URL / Link</label>
+                                                <input
+                                                    type="text"
+                                                    value={link.url}
+                                                    onChange={(e) => {
+                                                        const newLinks = [...(formData.social_links || [])];
+                                                        newLinks[idx].url = e.target.value;
+                                                        setFormData({ ...formData, social_links: newLinks });
+                                                    }}
+                                                    placeholder="https://..."
+                                                    className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-primary-500 outline-none"
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newLinks = (formData.social_links || []).filter((_, i) => i !== idx);
+                                                    setFormData({ ...formData, social_links: newLinks });
+                                                }}
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                        <Mail size={14} className="text-gray-500" /> Email Link / URL
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.mail_url}
-                                        onChange={(e) => setFormData({ ...formData, mail_url: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                        placeholder="mailto:example@..."
-                                    />
-                                </div>
+                                {(!formData.social_links || formData.social_links.length === 0) && (
+                                    <p className="text-sm text-gray-400 italic text-center py-4 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                                        No social links added yet. Click "Add Social Link" to start.
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <div>
@@ -467,9 +507,16 @@ export default function AdminTeamPage() {
                                                 <h3 className="text-lg font-bold group-hover:text-primary-700 transition-colors">{member.name}</h3>
                                                 <p className="text-primary-600 font-bold text-xs uppercase tracking-widest">{member.role}</p>
                                                 <div className="flex items-center space-x-2 mt-1">
-                                                    {member.linkedin_url && <Linkedin size={14} className="text-blue-600" />}
-                                                    {member.twitter_url && <Twitter size={14} className="text-sky-500" />}
-                                                    {member.mail_url && <Mail size={14} className="text-gray-500" />}
+                                                    {(member.social_links || []).map((link, i) => {
+                                                        if (link.platform === 'Facebook') return <Facebook key={i} size={14} className="text-blue-700" />;
+                                                        if (link.platform === 'Instagram') return <Instagram key={i} size={14} className="text-pink-600" />;
+                                                        if (link.platform === 'Youtube') return <Youtube key={i} size={14} className="text-red-600" />;
+                                                        if (link.platform === 'LinkedIn') return <Linkedin key={i} size={14} className="text-blue-600" />;
+                                                        if (link.platform === 'Twitter') return <Twitter key={i} size={14} className="text-sky-500" />;
+                                                        if (link.platform === 'Github') return <Github key={i} size={14} className="text-gray-900" />;
+                                                        if (link.platform === 'Mail') return <Mail key={i} size={14} className="text-gray-500" />;
+                                                        return <Globe key={i} size={14} className="text-primary-500" />;
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail, ExternalLink, Briefcase, User, RefreshCw, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail, ExternalLink, Briefcase, User, RefreshCw, Linkedin, Twitter, Star, Quote, ChevronRight, Play, CheckCircle2, Trophy, Lightbulb, Rocket, Facebook, Instagram, Youtube, Globe, Github } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
 
@@ -321,30 +321,36 @@ export default function HomePage() {
                       </Link>
                     </div>
 
-                    {/* Social Icons Overlay - Professional Style */}
-                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                      {member.linkedin_url && (
-                        <>
-                          <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors" onClick={(e) => e.stopPropagation()}>
-                            <Linkedin size={14} />
-                          </a>
-                          {(member.twitter_url || member.mail_url) && <div className="w-px h-3 bg-gray-200"></div>}
-                        </>
-                      )}
-                      {member.twitter_url && (
-                        <>
-                          <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors" onClick={(e) => e.stopPropagation()}>
-                            <Twitter size={14} />
-                          </a>
-                          {member.mail_url && <div className="w-px h-3 bg-gray-200"></div>}
-                        </>
-                      )}
-                      {member.mail_url && (
-                        <a href={member.mail_url.startsWith('http') ? member.mail_url : (member.mail_url.includes('@') ? `mailto:${member.mail_url}` : member.mail_url)} className="text-gray-600 hover:text-primary-600 transition-colors" onClick={(e) => e.stopPropagation()}>
-                          <Mail size={14} />
-                        </a>
-                      )}
-                      {!member.linkedin_url && !member.twitter_url && !member.mail_url && (
+                    {/* Dynamic Social Icons Overlay */}
+                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                      {(member.social_links as any[] || []).length > 0 ? (
+                        (member.social_links as any[] || []).map((link, i) => {
+                          const platformIcons: Record<string, any> = {
+                            Facebook: Facebook,
+                            Instagram: Instagram,
+                            Youtube: Youtube,
+                            LinkedIn: Linkedin,
+                            Twitter: Twitter,
+                            Github: Github,
+                            Mail: Mail,
+                            Website: Globe
+                          };
+                          const Icon = platformIcons[link.platform] || Globe;
+
+                          return (
+                            <a
+                              key={i}
+                              href={link.url.startsWith('http') ? link.url : (link.platform === 'Mail' ? `mailto:${link.url}` : link.url)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-gray-600 hover:text-primary-600 transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Icon size={14} />
+                            </a>
+                          );
+                        })
+                      ) : (
                         <span className="text-[8px] uppercase tracking-tighter text-gray-400 font-bold px-2">No Socials</span>
                       )}
                     </div>
