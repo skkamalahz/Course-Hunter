@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Save, RefreshCw, Film, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, RefreshCw, Film, Image as ImageIcon, X, Upload } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface GalleryItem {
@@ -28,6 +28,7 @@ export default function GalleryManagementPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<GalleryItem | null>(null);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -66,6 +67,35 @@ export default function GalleryManagementPage() {
             setCategories(data || []);
         } catch (error) {
             console.error('Error fetching categories:', error);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editForm) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `gallery-photos/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('gallery-images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('gallery-images')
+                .getPublicUrl(filePath);
+
+            setEditForm({ ...editForm, src: publicUrl });
+        } catch (error: any) {
+            console.error('Error uploading image:', error);
+            alert('Error uploading image: ' + (error.message || 'Check if "gallery-images" bucket exists and is public.'));
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -230,13 +260,31 @@ export default function GalleryManagementPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Src Path</label>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image / Thumbnail</label>
+                                    <div className="flex items-center space-x-4 mb-2">
+                                        <div className="relative group w-16 h-16 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                                            {editForm.src ? (
+                                                <img src={editForm.src} className="w-full h-full object-cover" alt="Preview" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                    <ImageIcon size={24} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <label className="flex-1 flex items-center justify-center px-4 py-3 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-primary-50 transition-all group">
+                                            <div className="flex items-center space-x-2 text-gray-500 group-hover:text-primary-600">
+                                                {uploading ? <RefreshCw className="animate-spin" size={18} /> : <Upload size={18} />}
+                                                <span className="text-sm font-bold">{uploading ? 'Uploading...' : 'Upload Image'}</span>
+                                            </div>
+                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                        </label>
+                                    </div>
                                     <input
                                         type="text"
                                         value={editForm.src}
                                         onChange={(e) => setEditForm({ ...editForm, src: e.target.value })}
-                                        className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-primary-500 outline-none"
-                                        placeholder="Image/Thumbnail Path"
+                                        className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-primary-500 outline-none text-sm"
+                                        placeholder="Image path or paste URL"
                                     />
                                 </div>
                                 {editForm.type === 'video' && (
