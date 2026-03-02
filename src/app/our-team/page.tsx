@@ -76,20 +76,26 @@ export default function OurTeamPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen bg-white">
-                {/* Banner Section */}
-                <section className="relative h-[40vh] flex items-center justify-center bg-primary-900 overflow-hidden">
-                    <div className="absolute inset-0 opacity-20">
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+            <div className="min-h-screen bg-white pt-20">
+                {/* Hero Section */}
+                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
+                        >
+                            Our Team
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="text-xl text-gray-600 max-w-3xl mx-auto"
+                        >
+                            Meet the dedicated professionals driving our mission forward and delivering excellence
+                        </motion.p>
                     </div>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="relative z-10 text-center"
-                    >
-                        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight font-serif uppercase animate-fade-up">OUR TEAM</h1>
-                        <div className="h-0.5 w-16 bg-accent-500/60 mx-auto"></div>
-                    </motion.div>
                 </section>
 
                 <section className="py-24 bg-gray-50">
