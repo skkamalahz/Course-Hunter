@@ -47,122 +47,111 @@ export default function ServicesPage() {
 
     return (
         <PublicLayout>
-            <div className="relative pt-32 pb-20 overflow-hidden bg-[#fafafa]">
-                {/* Background Decor */}
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] bg-primary-50 rounded-full blur-3xl opacity-50 z-0"></div>
-                <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[600px] h-[600px] bg-accent-50 rounded-full blur-3xl opacity-30 z-0"></div>
-
-                <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
-                    <div className="text-center max-w-3xl mx-auto mb-20">
-                        <motion.span
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="inline-block px-4 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-bold uppercase tracking-widest text-primary-600 mb-6"
-                        >
-                            Our Expertise
-                        </motion.span>
+            <div className="min-h-screen pt-20">
+                {/* Hero Section */}
+                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-5xl md:text-7xl font-serif text-gray-900 mb-8 leading-tight"
+                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                         >
-                            Innovative <span className="text-primary-600">Solutions</span> for Your Business
+                            Our Services
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-lg text-gray-600 leading-relaxed font-sans"
+                            transition={{ delay: 0.1 }}
+                            className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            We combine creativity with data-driven strategies to help your brand stand out in the digital landscape. Explore our wide range of professional services tailored to your needs.
+                            We combine creativity with data-driven strategies to help your brand stand out in the digital landscape.
                         </motion.p>
                     </div>
+                </section>
 
-                    {loading ? (
-                        <div className="flex justify-center items-center py-20">
-                            <Icons.RefreshCw className="animate-spin text-primary-600" size={40} />
-                        </div>
-                    ) : (
-                        <div className="space-y-32">
-                            {services.map((service, index) => (
-                                <motion.section
-                                    key={service.id}
-                                    initial={{ opacity: 0, y: 50 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.8 }}
-                                    className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-20`}
-                                >
-                                    {/* Content Side */}
-                                    <div className="flex-1 space-y-8 text-left">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="p-3 bg-primary-50 rounded-2xl text-primary-600">
-                                                {getIcon(service.icon)}
-                                            </div>
-                                            <div className="h-px flex-1 bg-gradient-to-r from-primary-100 to-transparent"></div>
+                {loading ? (
+                    <div className="flex justify-center items-center py-20">
+                        <Icons.RefreshCw className="animate-spin text-primary-600" size={40} />
+                    </div>
+                ) : (
+                    <div className="space-y-32">
+                        {services.map((service, index) => (
+                            <motion.section
+                                key={service.id}
+                                initial={{ opacity: 0, y: 50 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                                className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-20`}
+                            >
+                                {/* Content Side */}
+                                <div className="flex-1 space-y-8 text-left">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="p-3 bg-primary-50 rounded-2xl text-primary-600">
+                                            {getIcon(service.icon)}
                                         </div>
-
-                                        <h2 className="text-4xl md:text-5xl font-serif text-gray-900 leading-tight">
-                                            {service.title}
-                                        </h2>
-
-                                        <p className="text-gray-600 text-lg leading-relaxed font-sans border-l-4 border-primary-600 pl-6 py-2 bg-primary-50/30 rounded-r-2xl italic">
-                                            {service.description}
-                                        </p>
-
-                                        <p className="text-gray-500 leading-relaxed font-sans whitespace-pre-wrap">
-                                            {service.detailed_description || "We provide top-notch professional solutions tailored to your specific business goals, ensuring maximum impact and sustainable growth in your industry."}
-                                        </p>
-
-                                        <motion.a
-                                            href="/contact-us"
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="inline-flex items-center px-8 py-4 bg-primary-900 text-white font-bold rounded-2xl hover:bg-primary-800 transition-all shadow-lg group"
-                                        >
-                                            <span>Inquire Now</span>
-                                            <Icons.ArrowRight size={20} className="ml-3 group-hover:translate-x-1 transition-transform" />
-                                        </motion.a>
+                                        <div className="h-px flex-1 bg-gradient-to-r from-primary-100 to-transparent"></div>
                                     </div>
 
-                                    {/* Image Side */}
-                                    <div className="flex-1 w-full">
-                                        <div className="relative aspect-video lg:aspect-square group">
-                                            {/* Decorative Background for Image */}
-                                            <div className="absolute -inset-4 bg-gradient-to-br from-primary-100 to-accent-50 rounded-[2.5rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500"></div>
+                                    <h2 className="text-4xl md:text-5xl font-serif text-gray-900 leading-tight">
+                                        {service.title}
+                                    </h2>
 
-                                            <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-white/20 shadow-2xl">
-                                                {service.image_url ? (
-                                                    <img
-                                                        src={service.image_url}
-                                                        alt={service.title}
-                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-12">
-                                                        <div className="text-center space-y-4">
-                                                            <div className="p-6 bg-white/50 backdrop-blur-md rounded-full inline-block">
-                                                                {(Icons as any)[service.icon] ?
-                                                                    React.createElement((Icons as any)[service.icon], { size: 64, className: "text-gray-400" }) :
-                                                                    <Icons.Briefcase size={64} className="text-gray-400" />
-                                                                }
-                                                            </div>
-                                                            <p className="text-gray-400 font-medium italic">Visualization coming soon</p>
+                                    <p className="text-gray-600 text-lg leading-relaxed font-sans border-l-4 border-primary-600 pl-6 py-2 bg-primary-50/30 rounded-r-2xl italic">
+                                        {service.description}
+                                    </p>
+
+                                    <p className="text-gray-500 leading-relaxed font-sans whitespace-pre-wrap">
+                                        {service.detailed_description || "We provide top-notch professional solutions tailored to your specific business goals, ensuring maximum impact and sustainable growth in your industry."}
+                                    </p>
+
+                                    <motion.a
+                                        href="/contact-us"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="inline-flex items-center px-8 py-4 bg-primary-900 text-white font-bold rounded-2xl hover:bg-primary-800 transition-all shadow-lg group"
+                                    >
+                                        <span>Inquire Now</span>
+                                        <Icons.ArrowRight size={20} className="ml-3 group-hover:translate-x-1 transition-transform" />
+                                    </motion.a>
+                                </div>
+
+                                {/* Image Side */}
+                                <div className="flex-1 w-full">
+                                    <div className="relative aspect-video lg:aspect-square group">
+                                        {/* Decorative Background for Image */}
+                                        <div className="absolute -inset-4 bg-gradient-to-br from-primary-100 to-accent-50 rounded-[2.5rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500"></div>
+
+                                        <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-white/20 shadow-2xl">
+                                            {service.image_url ? (
+                                                <img
+                                                    src={service.image_url}
+                                                    alt={service.title}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-12">
+                                                    <div className="text-center space-y-4">
+                                                        <div className="p-6 bg-white/50 backdrop-blur-md rounded-full inline-block">
+                                                            {(Icons as any)[service.icon] ?
+                                                                React.createElement((Icons as any)[service.icon], { size: 64, className: "text-gray-400" }) :
+                                                                <Icons.Briefcase size={64} className="text-gray-400" />
+                                                            }
                                                         </div>
+                                                        <p className="text-gray-400 font-medium italic">Visualization coming soon</p>
                                                     </div>
-                                                )}
+                                                </div>
+                                            )}
 
-                                                {/* Glass overlay on hover */}
-                                                <div className="absolute inset-0 bg-primary-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                            </div>
+                                            {/* Glass overlay on hover */}
+                                            <div className="absolute inset-0 bg-primary-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>
                                     </div>
-                                </motion.section>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                                </div>
+                            </motion.section>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* CTA Section */}
@@ -200,6 +189,6 @@ export default function ServicesPage() {
                     </motion.div>
                 </div>
             </section>
-        </PublicLayout>
+        </PublicLayout >
     );
 }
