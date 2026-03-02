@@ -286,7 +286,7 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-5xl font-serif text-gray-900 uppercase tracking-widest">Meet the Leadership</h2>
             <div className="h-px w-16 bg-primary-300 mx-auto mt-6 mb-16"></div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
+            <div className="flex flex-wrap justify-center gap-16">
               {leadership.map((member, index) => (
                 <motion.div
                   key={member.id}
@@ -294,7 +294,7 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group text-center"
+                  className="group text-center w-full sm:w-[320px]"
                 >
                   <div className="relative mb-8 mx-auto w-56 h-56">
                     {/* Decorative background circle */}

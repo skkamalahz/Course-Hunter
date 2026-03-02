@@ -100,7 +100,7 @@ export default function OurTeamPage() {
                                     <div className="h-px w-12 bg-primary-300 mx-auto mt-4"></div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+                                <div className="flex flex-wrap justify-center gap-x-8 gap-y-16">
                                     {members.filter(m => m.category === category.name).map((member, index) => (
                                         <motion.div
                                             key={member.id}
@@ -108,7 +108,7 @@ export default function OurTeamPage() {
                                             whileInView={{ opacity: 1, scale: 1 }}
                                             viewport={{ once: true }}
                                             transition={{ delay: index * 0.05, duration: 0.5 }}
-                                            className="group text-center"
+                                            className="group text-center w-full sm:w-[280px]"
                                         >
                                             <div className="relative mb-8 mx-auto w-48 h-48 sm:w-56 sm:h-56">
                                                 {/* Decorative background circle */}
@@ -170,7 +170,7 @@ export default function OurTeamPage() {
                                     </h2>
                                     <div className="h-px w-12 bg-primary-300 mx-auto mt-4"></div>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+                                <div className="flex flex-wrap justify-center gap-x-8 gap-y-16">
                                     {uncategorized.map((member, index) => (
                                         <motion.div
                                             key={member.id}
@@ -178,7 +178,7 @@ export default function OurTeamPage() {
                                             whileInView={{ opacity: 1, scale: 1 }}
                                             viewport={{ once: true }}
                                             transition={{ delay: index * 0.05, duration: 0.5 }}
-                                            className="group text-center"
+                                            className="group text-center w-full sm:w-[280px]"
                                         >
                                             <div className="relative mb-8 mx-auto w-48 h-48 sm:w-56 sm:h-56">
                                                 {/* Decorative background circle */}
