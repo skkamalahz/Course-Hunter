@@ -16,19 +16,33 @@ interface GalleryItem {
     order_index: number;
 }
 
+interface Category {
+    id: string;
+    name: string;
+}
+
 export default function GalleryManagementPage() {
     const [loading, setLoading] = useState(true);
     const [gallery, setGallery] = useState<GalleryItem[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<GalleryItem | null>(null);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        fetchGallery();
+        fetchData();
     }, []);
 
-    const fetchGallery = async () => {
+    const fetchData = async () => {
         setLoading(true);
+        await Promise.all([
+            fetchGallery(),
+            fetchCategories()
+        ]);
+        setLoading(false);
+    };
+
+    const fetchGallery = async () => {
         try {
             const { data, error } = await supabase
                 .from('gallery_items')
@@ -39,8 +53,19 @@ export default function GalleryManagementPage() {
             setGallery(data || []);
         } catch (error) {
             console.error('Error fetching gallery:', error);
-        } finally {
-            setLoading(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('gallery_categories')
+                .select('id, name')
+                .order('order_index');
+            if (error) throw error;
+            setCategories(data || []);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
         }
     };
 
@@ -107,7 +132,7 @@ export default function GalleryManagementPage() {
             type: 'image',
             src: '/assets/all-images/5-1.png',
             title: 'New Gallery Item',
-            category: 'Campaigns',
+            category: categories[0]?.name || 'Campaigns',
             description: 'Gallery item description',
             order_index: gallery.length + 1
         };
@@ -133,13 +158,21 @@ export default function GalleryManagementPage() {
                     </h1>
                     <p className="text-gray-600">Manage campaigns, culture photos, and videos</p>
                 </div>
-                <button
-                    onClick={handleAdd}
-                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2"
-                >
-                    <Plus size={20} />
-                    <span>Add Item</span>
-                </button>
+                <div className="flex items-center space-x-4">
+                    <a
+                        href="/admin/gallery-categories"
+                        className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all flex items-center space-x-2"
+                    >
+                        <span>Manage Categories</span>
+                    </a>
+                    <button
+                        onClick={handleAdd}
+                        className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center space-x-2"
+                    >
+                        <Plus size={20} />
+                        <span>Add Item</span>
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -181,9 +214,9 @@ export default function GalleryManagementPage() {
                                         onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                                         className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-primary-500 outline-none"
                                     >
-                                        <option value="Campaigns">Campaigns</option>
-                                        <option value="Culture">Culture</option>
-                                        <option value="Videos">Videos</option>
+                                        {categories.map(cat => (
+                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>

@@ -17,18 +17,48 @@ interface GalleryItem {
     description: string;
 }
 
-const categories = ['All', 'Campaigns', 'Culture', 'Videos'];
+interface Category {
+    id: string;
+    name: string;
+}
 
 export default function GalleryPage() {
     const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        fetchGallery();
+        fetchData();
     }, []);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            await Promise.all([
+                fetchGallery(),
+                fetchCategories()
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('gallery_categories')
+                .select('*')
+                .order('order_index', { ascending: true });
+
+            if (error) throw error;
+            setCategories(data || []);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
 
     const fetchGallery = async () => {
         try {
@@ -108,21 +138,31 @@ export default function GalleryPage() {
                             transition={{ duration: 0.8, delay: 0.2 }}
                             className="flex flex-wrap justify-center gap-4 mb-16"
                         >
+                            <motion.button
+                                key="All"
+                                onClick={() => setSelectedCategory('All')}
+                                className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${selectedCategory === 'All'
+                                    ? 'backdrop-blur-xl bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-xl border border-white/40'
+                                    : 'backdrop-blur-xl bg-white/60 border border-white/40 text-gray-700 hover:bg-white/80'
+                                    }`}
+                            >
+                                All
+                            </motion.button>
                             {categories.map((category, index) => (
                                 <motion.button
-                                    key={category}
+                                    key={category.id}
                                     initial={{ opacity: 0, scale: 0.8 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: index * 0.1 }}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${selectedCategory === category
+                                    onClick={() => setSelectedCategory(category.name)}
+                                    className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${selectedCategory === category.name
                                         ? 'backdrop-blur-xl bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-xl border border-white/40'
                                         : 'backdrop-blur-xl bg-white/60 border border-white/40 text-gray-700 hover:bg-white/80'
                                         }`}
                                 >
-                                    {category}
+                                    {category.name}
                                 </motion.button>
                             ))}
                         </motion.div>
