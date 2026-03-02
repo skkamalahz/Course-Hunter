@@ -24,6 +24,7 @@ interface Category {
 export default function GalleryPage() {
     const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [header, setHeader] = useState({ title: 'Our Gallery', subtitle: 'Explore our successful marketing campaigns, vibrant company culture, and creative moments' });
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
@@ -36,10 +37,18 @@ export default function GalleryPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            await Promise.all([
+            const [headerRes] = await Promise.all([
+                supabase.from('page_headers').select('*').eq('id', 'gallery').single(),
                 fetchGallery(),
                 fetchCategories()
             ]);
+
+            if (headerRes.data) {
+                setHeader({
+                    title: headerRes.data.title,
+                    subtitle: headerRes.data.subtitle
+                });
+            }
         } finally {
             setLoading(false);
         }
@@ -121,7 +130,7 @@ export default function GalleryPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                         >
-                            Our Gallery
+                            {header.title}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -129,7 +138,7 @@ export default function GalleryPage() {
                             transition={{ delay: 0.1 }}
                             className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            Explore our successful marketing campaigns, vibrant company culture, and creative moments
+                            {header.subtitle}
                         </motion.p>
                     </div>
                 </section>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Layout, Info, Mail } from 'lucide-react';
+import { Save, RefreshCw, Layout, Info, Mail, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AdminContentPage() {
@@ -14,6 +14,7 @@ export default function AdminContentPage() {
     const [homeData, setHomeData] = useState({ title: '', subtitle: '', cta_text: '' });
     const [aboutData, setAboutData] = useState({ title: '', mission: '', vision: '', story: '' });
     const [contactData, setContactData] = useState({ email: '', phone: '', address: '' });
+    const [bannerData, setBannerData] = useState<Record<string, { title: string, subtitle: string }>>({});
 
     useEffect(() => {
         fetchAllData();
@@ -22,10 +23,11 @@ export default function AdminContentPage() {
     const fetchAllData = async () => {
         setLoading(true);
         try {
-            const [heroRes, aboutRes, contactRes] = await Promise.all([
+            const [heroRes, aboutRes, contactRes, bannersRes] = await Promise.all([
                 supabase.from('hero_settings').select('*').eq('id', 'hero_001').single(),
                 supabase.from('about_settings').select('*').eq('id', 'about_001').single(),
-                supabase.from('contact_settings').select('*').eq('id', 'contact_001').single()
+                supabase.from('contact_settings').select('*').eq('id', 'contact_001').single(),
+                supabase.from('page_headers').select('*')
             ]);
 
             if (heroRes.data) setHomeData({
@@ -44,6 +46,13 @@ export default function AdminContentPage() {
                 phone: contactRes.data.phone,
                 address: contactRes.data.address
             });
+            if (bannersRes.data) {
+                const banners: Record<string, { title: string, subtitle: string }> = {};
+                bannersRes.data.forEach((b: any) => {
+                    banners[b.id] = { title: b.title, subtitle: b.subtitle };
+                });
+                setBannerData(banners);
+            }
         } catch (error) {
             console.error('Error fetching content:', error);
         } finally {
@@ -99,6 +108,23 @@ export default function AdminContentPage() {
         }
     };
 
+    const handleSaveBanner = async (pageId: string) => {
+        setSaving(true);
+        try {
+            const { error } = await supabase
+                .from('page_headers')
+                .update(bannerData[pageId])
+                .eq('id', pageId);
+            if (error) throw error;
+            alert(`${pageId.charAt(0).toUpperCase() + pageId.slice(1)} banner updated!`);
+        } catch (error) {
+            console.error('Save failed:', error);
+            alert('Save failed');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -109,6 +135,7 @@ export default function AdminContentPage() {
 
     const tabs = [
         { id: 'home', label: 'Home Page', icon: Layout },
+        { id: 'banners', label: 'Page Banners', icon: ImageIcon },
         { id: 'about', label: 'About Us', icon: Info },
         { id: 'contact', label: 'Contact', icon: Mail },
     ];
@@ -192,6 +219,59 @@ export default function AdminContentPage() {
                             {saving ? <RefreshCw className="animate-spin" size={20} /> : <Save size={20} />}
                             <span>Save Home Content</span>
                         </button>
+                    </motion.div>
+                )}
+
+                {activeTab === 'banners' && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-12"
+                    >
+                        <h2 className="text-2xl font-bold mb-6 text-gray-800">Page Banners Management</h2>
+                        <div className="grid grid-cols-1 gap-12">
+                            {['services', 'team', 'work', 'gallery', 'career', 'about'].map((pageId) => (
+                                <div key={pageId} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 space-y-4">
+                                    <h3 className="text-lg font-bold text-primary-600 uppercase tracking-wider">
+                                        {pageId === 'work' ? 'Our Work' : pageId === 'team' ? 'Our Team' : pageId.charAt(0).toUpperCase() + pageId.slice(1)}
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                                            <input
+                                                type="text"
+                                                value={bannerData[pageId]?.title || ''}
+                                                onChange={(e) => setBannerData({
+                                                    ...bannerData,
+                                                    [pageId]: { ...bannerData[pageId], title: e.target.value }
+                                                })}
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 outline-none bg-white transition-all"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Subtitle</label>
+                                            <textarea
+                                                value={bannerData[pageId]?.subtitle || ''}
+                                                onChange={(e) => setBannerData({
+                                                    ...bannerData,
+                                                    [pageId]: { ...bannerData[pageId], subtitle: e.target.value }
+                                                })}
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 outline-none bg-white transition-all"
+                                                rows={2}
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => handleSaveBanner(pageId)}
+                                            disabled={saving}
+                                            className="px-6 py-3 bg-white border border-primary-200 text-primary-700 rounded-xl hover:bg-primary-50 transition-all font-semibold flex items-center space-x-2 disabled:opacity-50"
+                                        >
+                                            {saving ? <RefreshCw className="animate-spin" size={18} /> : <Save size={18} />}
+                                            <span>Update {pageId.charAt(0).toUpperCase() + pageId.slice(1)} Banner</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </motion.div>
                 )}
 

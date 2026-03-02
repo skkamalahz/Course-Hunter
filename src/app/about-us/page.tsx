@@ -18,6 +18,7 @@ interface AboutSettings {
 
 export default function AboutUsPage() {
     const [about, setAbout] = useState<AboutSettings | null>(null);
+    const [header, setHeader] = useState({ title: 'About Us', subtitle: 'Learn more about our journey and the values that drive us' });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -26,16 +27,22 @@ export default function AboutUsPage() {
 
     const fetchAbout = async () => {
         try {
-            const { data, error } = await supabase
-                .from('about_settings')
-                .select('*')
-                .eq('id', 'about_001')
-                .single();
+            const [aboutRes, headerRes] = await Promise.all([
+                supabase.from('about_settings').select('*').eq('id', 'about_001').single(),
+                supabase.from('page_headers').select('*').eq('id', 'about').single()
+            ]);
 
-            if (error) throw error;
-            setAbout(data);
+            if (aboutRes.error) throw aboutRes.error;
+            setAbout(aboutRes.data);
+
+            if (headerRes.data) {
+                setHeader({
+                    title: headerRes.data.title,
+                    subtitle: headerRes.data.subtitle
+                });
+            }
         } catch (error) {
-            console.error('Error fetching about data:', error);
+            console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
@@ -64,7 +71,7 @@ export default function AboutUsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                         >
-                            About Us
+                            {header.title}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -72,7 +79,7 @@ export default function AboutUsPage() {
                             transition={{ delay: 0.1 }}
                             className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            {about.title}
+                            {header.subtitle}
                         </motion.p>
                     </div>
                 </section>

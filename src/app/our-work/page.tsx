@@ -18,24 +18,32 @@ interface PortfolioItem {
 
 export default function OurWorkPage() {
     const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+    const [header, setHeader] = useState({ title: 'Our Work', subtitle: 'Explore our portfolio of successful projects and campaigns' });
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
 
     useEffect(() => {
-        fetchPortfolio();
+        fetchData();
     }, []);
 
-    const fetchPortfolio = async () => {
+    const fetchData = async () => {
         try {
-            const { data, error } = await supabase
-                .from('portfolio_items')
-                .select('*')
-                .order('order_index', { ascending: true });
+            const [portfolioRes, headerRes] = await Promise.all([
+                supabase.from('portfolio_items').select('*').order('order_index', { ascending: true }),
+                supabase.from('page_headers').select('*').eq('id', 'work').single()
+            ]);
 
-            if (error) throw error;
-            setPortfolio(data || []);
+            if (portfolioRes.error) throw portfolioRes.error;
+            setPortfolio(portfolioRes.data || []);
+
+            if (headerRes.data) {
+                setHeader({
+                    title: headerRes.data.title,
+                    subtitle: headerRes.data.subtitle
+                });
+            }
         } catch (error) {
-            console.error('Error fetching portfolio:', error);
+            console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
@@ -68,7 +76,7 @@ export default function OurWorkPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                         >
-                            Our Work
+                            {header.title}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -76,7 +84,7 @@ export default function OurWorkPage() {
                             transition={{ delay: 0.1 }}
                             className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            Explore our portfolio of successful projects and campaigns
+                            {header.subtitle}
                         </motion.p>
                     </div>
                 </section>

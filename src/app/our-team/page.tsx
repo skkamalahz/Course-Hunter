@@ -29,15 +29,17 @@ interface Category {
 export default function OurTeamPage() {
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [header, setHeader] = useState({ title: 'Our Team', subtitle: 'Meet the dedicated professionals driving our mission forward and delivering excellence' });
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const [catResult, memberResult] = await Promise.all([
+                const [catResult, memberResult, headerResult] = await Promise.all([
                     supabase.from('team_categories').select('*').order('order_index', { ascending: true }),
-                    supabase.from('team_members').select('*').order('order_index', { ascending: true })
+                    supabase.from('team_members').select('*').order('order_index', { ascending: true }),
+                    supabase.from('page_headers').select('*').eq('id', 'team').single()
                 ]);
 
                 if (catResult.error) throw catResult.error;
@@ -45,6 +47,13 @@ export default function OurTeamPage() {
 
                 setCategories(catResult.data || []);
                 setMembers(memberResult.data || []);
+
+                if (headerResult.data) {
+                    setHeader({
+                        title: headerResult.data.title,
+                        subtitle: headerResult.data.subtitle
+                    });
+                }
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -85,7 +94,7 @@ export default function OurTeamPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                         >
-                            Our Team
+                            {header.title}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -93,7 +102,7 @@ export default function OurTeamPage() {
                             transition={{ delay: 0.1 }}
                             className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            Meet the dedicated professionals driving our mission forward and delivering excellence
+                            {header.subtitle}
                         </motion.p>
                     </div>
                 </section>

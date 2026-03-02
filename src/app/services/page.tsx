@@ -18,26 +18,34 @@ interface Service {
 
 export default function ServicesPage() {
     const [services, setServices] = useState<Service[]>([]);
+    const [header, setHeader] = useState({ title: 'Services', subtitle: 'Explore our professional solutions tailored to your business needs and drive sustainable growth.' });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchServices = async () => {
+        const fetchData = async () => {
             try {
-                const { data, error } = await supabase
-                    .from('services')
-                    .select('*')
-                    .order('order_index');
+                const [servicesRes, headerRes] = await Promise.all([
+                    supabase.from('services').select('*').order('order_index'),
+                    supabase.from('page_headers').select('*').eq('id', 'services').single()
+                ]);
 
-                if (error) throw error;
-                setServices(data || []);
+                if (servicesRes.error) throw servicesRes.error;
+                setServices(servicesRes.data || []);
+
+                if (headerRes.data) {
+                    setHeader({
+                        title: headerRes.data.title,
+                        subtitle: headerRes.data.subtitle
+                    });
+                }
             } catch (error) {
-                console.error('Error fetching services:', error);
+                console.error('Error fetching data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchServices();
+        fetchData();
     }, []);
 
     const getIcon = (iconName: string) => {
@@ -54,7 +62,7 @@ export default function ServicesPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                     >
-                        Services
+                        {header.title}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -62,7 +70,7 @@ export default function ServicesPage() {
                         transition={{ delay: 0.1 }}
                         className="text-xl text-gray-600 max-w-3xl mx-auto"
                     >
-                        Explore our professional solutions tailored to your business needs and drive sustainable growth.
+                        {header.subtitle}
                     </motion.p>
                 </div>
             </section>

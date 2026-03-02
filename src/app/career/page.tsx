@@ -18,23 +18,31 @@ interface Job {
 
 export default function CareerPage() {
     const [jobs, setJobs] = useState<Job[]>([]);
+    const [header, setHeader] = useState({ title: 'Career', subtitle: 'Join our team and be part of something amazing' });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchJobs();
+        fetchData();
     }, []);
 
-    const fetchJobs = async () => {
+    const fetchData = async () => {
         try {
-            const { data, error } = await supabase
-                .from('careers')
-                .select('*')
-                .order('order_index', { ascending: true });
+            const [jobsRes, headerRes] = await Promise.all([
+                supabase.from('careers').select('*').order('order_index', { ascending: true }),
+                supabase.from('page_headers').select('*').eq('id', 'career').single()
+            ]);
 
-            if (error) throw error;
-            setJobs(data || []);
+            if (jobsRes.error) throw jobsRes.error;
+            setJobs(jobsRes.data || []);
+
+            if (headerRes.data) {
+                setHeader({
+                    title: headerRes.data.title,
+                    subtitle: headerRes.data.subtitle
+                });
+            }
         } catch (error) {
-            console.error('Error fetching jobs:', error);
+            console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
@@ -61,7 +69,7 @@ export default function CareerPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
                         >
-                            Career
+                            {header.title}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -69,7 +77,7 @@ export default function CareerPage() {
                             transition={{ delay: 0.1 }}
                             className="text-xl text-gray-600 max-w-3xl mx-auto"
                         >
-                            Join our team and be part of something amazing
+                            {header.subtitle}
                         </motion.p>
                     </div>
                 </section>
