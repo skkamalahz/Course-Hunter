@@ -108,7 +108,7 @@ export default function GalleryPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen pt-24 bg-gradient-to-br from-gray-50 via-white to-primary-50/20 relative overflow-hidden">
+            <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-50 via-white to-primary-50/20 relative overflow-hidden">
                 {/* Decorative background elements */}
                 <div className="absolute top-20 right-20 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 left-20 w-72 h-72 bg-accent-200/20 rounded-full blur-3xl"></div>
