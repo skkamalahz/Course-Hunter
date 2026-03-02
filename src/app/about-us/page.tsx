@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Target, Eye, Heart, Zap, RefreshCw } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
-import PageHeader from '@/components/common/PageHeader';
 
 const valueIcons = [Target, Eye, Heart, Zap];
 
@@ -56,8 +55,27 @@ export default function AboutUsPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen">
-                <PageHeader pagePath="/about-us" />
+            <div className="min-h-screen pt-20">
+                {/* Hero Section */}
+                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
+                        >
+                            About Us
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="text-xl text-gray-600 max-w-3xl mx-auto"
+                        >
+                            {about.title}
+                        </motion.p>
+                    </div>
+                </section>
 
                 {/* Mission & Vision */}
                 <section className="py-20 bg-white">
