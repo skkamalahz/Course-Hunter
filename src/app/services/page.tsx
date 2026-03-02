@@ -47,7 +47,7 @@ export default function ServicesPage() {
 
     return (
         <PublicLayout>
-            <div className="relative pt-32 pb-20 overflow-hidden bg-[#fafafa]">
+            <div className="relative pt-20 pb-20 overflow-hidden bg-[#fafafa]">
                 {/* Background Decor */}
                 <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] bg-primary-50 rounded-full blur-3xl opacity-50 z-0"></div>
                 <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[600px] h-[600px] bg-accent-50 rounded-full blur-3xl opacity-30 z-0"></div>
