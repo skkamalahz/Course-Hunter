@@ -129,15 +129,19 @@ export default function AdminContentPage() {
         }
 
         try {
-            const { error } = await supabase
+            const { error, data } = await supabase
                 .from('page_headers')
                 .update({
                     title: banner.title,
                     subtitle: banner.subtitle
                 })
-                .eq('id', banner.id);
+                .eq('id', banner.id)
+                .select();
+
             if (error) throw error;
+            console.log('Update successful:', data);
             alert(`${pageId.charAt(0).toUpperCase() + pageId.slice(1)} banner updated!`);
+            fetchAllData();
         } catch (error: any) {
             console.error('Save failed:', error);
             alert(`Save failed: ${error.message || 'Unknown error'}`);

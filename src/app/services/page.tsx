@@ -32,7 +32,9 @@ export default function ServicesPage() {
                 if (servicesRes.error) throw servicesRes.error;
                 setServices(servicesRes.data || []);
 
-                if (headerRes.data) {
+                if (headerRes.error) {
+                    console.error('Error fetching banner:', headerRes.error);
+                } else if (headerRes.data) {
                     setHeader({
                         title: headerRes.data.title,
                         subtitle: headerRes.data.subtitle
