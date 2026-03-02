@@ -325,10 +325,18 @@ export default function GalleryManagementPage() {
                         ) : (
                             <>
                                 <div className="relative h-48 bg-gray-900 flex items-center justify-center">
-                                    {item.type === 'video' ? (
-                                        <Film className="text-primary-400" size={48} />
+                                    {item.src ? (
+                                        <img
+                                            src={item.src}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover"
+                                        />
                                     ) : (
-                                        <ImageIcon className="text-accent-400" size={48} />
+                                        item.type === 'video' ? (
+                                            <Film className="text-primary-400" size={48} />
+                                        ) : (
+                                            <ImageIcon className="text-accent-400" size={48} />
+                                        )
                                     )}
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest rounded-full border border-white/10">
                                         {item.type}
