@@ -47,38 +47,32 @@ export default function ServicesPage() {
 
     return (
         <PublicLayout>
-            <div className="relative pt-32 pb-20 overflow-hidden bg-[#fafafa]">
+            <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50 pt-32">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
+                    >
+                        Services
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-xl text-gray-600 max-w-3xl mx-auto"
+                    >
+                        Explore our professional solutions tailored to your business needs and drive sustainable growth.
+                    </motion.p>
+                </div>
+            </section>
+
+            <div className="relative pt-20 pb-20 overflow-hidden bg-[#fafafa]">
                 {/* Background Decor */}
                 <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] bg-primary-50 rounded-full blur-3xl opacity-50 z-0"></div>
                 <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[600px] h-[600px] bg-accent-50 rounded-full blur-3xl opacity-30 z-0"></div>
 
                 <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
-                    <div className="text-center max-w-3xl mx-auto mb-20">
-                        <motion.span
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="inline-block px-4 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-bold uppercase tracking-widest text-primary-600 mb-6"
-                        >
-                            Our Expertise
-                        </motion.span>
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-5xl md:text-7xl font-serif text-gray-900 mb-8 leading-tight"
-                        >
-                            Innovative <span className="text-primary-600">Solutions</span> for Your Business
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-lg text-gray-600 leading-relaxed font-sans"
-                        >
-                            We combine creativity with data-driven strategies to help your brand stand out in the digital landscape. Explore our wide range of professional services tailored to your needs.
-                        </motion.p>
-                    </div>
-
                     {loading ? (
                         <div className="flex justify-center items-center py-20">
                             <Icons.RefreshCw className="animate-spin text-primary-600" size={40} />
