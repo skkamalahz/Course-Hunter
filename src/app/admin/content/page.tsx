@@ -129,18 +129,28 @@ export default function AdminContentPage() {
         }
 
         try {
+            console.log(`Attempting to update banner for ${pageId} with ID: ${banner.id}`);
             const { error, data } = await supabase
                 .from('page_headers')
                 .update({
-                    title: banner.title,
-                    subtitle: banner.subtitle
+                    title: banner.title.trim(),
+                    subtitle: banner.subtitle.trim(),
+                    updated_at: new Date().toISOString()
                 })
                 .eq('id', banner.id)
                 .select();
 
             if (error) throw error;
-            console.log('Update successful:', data);
-            alert(`${pageId.charAt(0).toUpperCase() + pageId.slice(1)} banner updated!`);
+            console.log('Update result:', data);
+
+            alert(`${pageId.charAt(0).toUpperCase() + pageId.slice(1)} banner updated successfully!`);
+            // Immediate local state sync before global fetch
+            if (data && data[0]) {
+                setBannerData(prev => ({
+                    ...prev,
+                    [pageId]: { ...prev[pageId], title: data[0].title, subtitle: data[0].subtitle }
+                }));
+            }
             fetchAllData();
         } catch (error: any) {
             console.error('Save failed:', error);
