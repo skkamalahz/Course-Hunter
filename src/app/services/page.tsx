@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
 import * as Icons from 'lucide-react';
@@ -10,7 +10,9 @@ interface Service {
     id: string;
     title: string;
     description: string;
+    detailed_description: string;
     icon: string;
+    image_url: string;
     order_index: number;
 }
 
@@ -82,39 +84,81 @@ export default function ServicesPage() {
                             <Icons.RefreshCw className="animate-spin text-primary-600" size={40} />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="space-y-32">
                             {services.map((service, index) => (
-                                <motion.div
+                                <motion.section
                                     key={service.id}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
-                                    whileHover={{ y: -10 }}
-                                    className="group relative h-full"
+                                    initial={{ opacity: 0, y: 50 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.8 }}
+                                    className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-20`}
                                 >
-                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-accent-600 rounded-3xl opacity-0 group-hover:opacity-10 dark:group-hover:opacity-20 transition duration-500 blur"></div>
-                                    <div className="relative h-full bg-white border border-gray-100 p-8 rounded-3xl shadow-sm group-hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                        {/* Hover Gradient Overlay */}
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-bl-full"></div>
-
-                                        <div className="relative mb-6 p-4 bg-gray-50 rounded-2xl w-fit group-hover:bg-primary-50 transition-colors duration-300">
-                                            {getIcon(service.icon)}
+                                    {/* Content Side */}
+                                    <div className="flex-1 space-y-8 text-left">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="p-3 bg-primary-50 rounded-2xl text-primary-600">
+                                                {getIcon(service.icon)}
+                                            </div>
+                                            <div className="h-px flex-1 bg-gradient-to-r from-primary-100 to-transparent"></div>
                                         </div>
 
-                                        <h3 className="text-2xl font-serif text-gray-900 mb-4 group-hover:text-primary-600 transition-colors duration-300">
+                                        <h2 className="text-4xl md:text-5xl font-serif text-gray-900 leading-tight">
                                             {service.title}
-                                        </h3>
+                                        </h2>
 
-                                        <p className="text-gray-600 leading-relaxed font-sans mb-6">
+                                        <p className="text-gray-600 text-lg leading-relaxed font-sans border-l-4 border-primary-600 pl-6 py-2 bg-primary-50/30 rounded-r-2xl italic">
                                             {service.description}
                                         </p>
 
-                                        <div className="flex items-center text-primary-600 font-bold text-sm uppercase tracking-wider group-hover:translate-x-2 transition-transform duration-300">
-                                            <span>Learn More</span>
-                                            <Icons.ArrowRight size={16} className="ml-2" />
+                                        <p className="text-gray-500 leading-relaxed font-sans whitespace-pre-wrap">
+                                            {service.detailed_description || "We provide top-notch professional solutions tailored to your specific business goals, ensuring maximum impact and sustainable growth in your industry."}
+                                        </p>
+
+                                        <motion.a
+                                            href="/contact-us"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="inline-flex items-center px-8 py-4 bg-primary-900 text-white font-bold rounded-2xl hover:bg-primary-800 transition-all shadow-lg group"
+                                        >
+                                            <span>Inquire Now</span>
+                                            <Icons.ArrowRight size={20} className="ml-3 group-hover:translate-x-1 transition-transform" />
+                                        </motion.a>
+                                    </div>
+
+                                    {/* Image Side */}
+                                    <div className="flex-1 w-full">
+                                        <div className="relative aspect-video lg:aspect-square group">
+                                            {/* Decorative Background for Image */}
+                                            <div className="absolute -inset-4 bg-gradient-to-br from-primary-100 to-accent-50 rounded-[2.5rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-500"></div>
+
+                                            <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-white/20 shadow-2xl">
+                                                {service.image_url ? (
+                                                    <img
+                                                        src={service.image_url}
+                                                        alt={service.title}
+                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-12">
+                                                        <div className="text-center space-y-4">
+                                                            <div className="p-6 bg-white/50 backdrop-blur-md rounded-full inline-block">
+                                                                {(Icons as any)[service.icon] ?
+                                                                    React.createElement((Icons as any)[service.icon], { size: 64, className: "text-gray-400" }) :
+                                                                    <Icons.Briefcase size={64} className="text-gray-400" />
+                                                                }
+                                                            </div>
+                                                            <p className="text-gray-400 font-medium italic">Visualization coming soon</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Glass overlay on hover */}
+                                                <div className="absolute inset-0 bg-primary-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </motion.div>
+                                </motion.section>
                             ))}
                         </div>
                     )}
@@ -122,7 +166,7 @@ export default function ServicesPage() {
             </div>
 
             {/* CTA Section */}
-            <section className="py-24 bg-white overflow-hidden relative">
+            <section className="py-24 bg-white overflow-hidden relative border-t border-gray-100">
                 <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10 text-center">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}

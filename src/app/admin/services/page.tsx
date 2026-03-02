@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Save, X, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, RefreshCw, Upload } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Service {
     id: string;
     title: string;
     description: string;
+    detailed_description: string;
     icon: string;
+    image_url: string;
     order_index: number;
 }
 
@@ -19,6 +22,7 @@ export default function ServicesManagementPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<Service | null>(null);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         fetchServices();
@@ -50,7 +54,9 @@ export default function ServicesManagementPage() {
                     .update({
                         title: service.title,
                         description: service.description,
+                        detailed_description: service.detailed_description,
                         icon: service.icon,
+                        image_url: service.image_url,
                         order_index: service.order_index
                     })
                     .eq('id', service.id);
@@ -61,7 +67,9 @@ export default function ServicesManagementPage() {
                     .insert([{
                         title: service.title,
                         description: service.description,
+                        detailed_description: service.detailed_description,
                         icon: service.icon,
+                        image_url: service.image_url,
                         order_index: service.order_index
                     }]);
                 if (error) throw error;
@@ -75,6 +83,37 @@ export default function ServicesManagementPage() {
             alert('Failed to save changes');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editForm) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `service-photos/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('service-images')
+                .upload(filePath, file, {
+                    contentType: file.type === 'image/webp' ? 'image/webp' : undefined
+                });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('service-images')
+                .getPublicUrl(filePath);
+
+            setEditForm({ ...editForm, image_url: publicUrl });
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Error uploading image!');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -104,8 +143,10 @@ export default function ServicesManagementPage() {
         const newService: Service = {
             id: Date.now().toString(),
             title: 'New Service',
-            description: 'Service description',
+            description: 'Service summary',
+            detailed_description: 'Detailed service description for the section...',
             icon: 'Briefcase',
+            image_url: '',
             order_index: services.length + 1
         };
         setEditingId(newService.id);
@@ -171,14 +212,49 @@ export default function ServicesManagementPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Icon Name</label>
-                                    <input
-                                        type="text"
-                                        value={editForm.icon}
-                                        onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Detailed Description (for Section)</label>
+                                    <textarea
+                                        value={editForm.detailed_description}
+                                        onChange={(e) => setEditForm({ ...editForm, detailed_description: e.target.value })}
                                         className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-primary-500 outline-none"
-                                        placeholder="Icon Name (e.g., Search, Target)"
+                                        rows={5}
+                                        placeholder="Briefly describe the service in detail for its own section..."
                                     />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Icon Name</label>
+                                        <input
+                                            type="text"
+                                            value={editForm.icon}
+                                            onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
+                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-primary-500 outline-none"
+                                            placeholder="Icon Name (e.g., Search, Target)"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Service Image</label>
+                                        <div className="flex items-center space-x-2">
+                                            <label className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                <Icons.Upload size={18} className="mr-2 text-gray-500" />
+                                                <span className="text-sm text-gray-600 truncate">
+                                                    {uploading ? 'Uploading...' : 'Upload Image'}
+                                                </span>
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*,.webp"
+                                                    onChange={handleImageUpload}
+                                                    disabled={uploading}
+                                                />
+                                            </label>
+                                            {editForm.image_url && (
+                                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                    <img src={editForm.image_url} alt="Preview" className="w-full h-full object-cover" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="flex space-x-2 pt-2">
                                     <button
@@ -206,10 +282,22 @@ export default function ServicesManagementPage() {
                                 <div className="flex-1">
                                     <h3 className="text-xl font-bold text-gray-800 mb-2">{service.title}</h3>
                                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">{service.description}</p>
-                                    <div className="inline-flex items-center px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-bold uppercase">
-                                        Icon: {service.icon}
+                                    <div className="flex flex-wrap gap-2">
+                                        <div className="inline-flex items-center px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-[10px] font-bold uppercase">
+                                            Icon: {service.icon}
+                                        </div>
+                                        {service.image_url && (
+                                            <div className="inline-flex items-center px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase">
+                                                Image Attached
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
+                                {service.image_url && (
+                                    <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-100 ml-4 hidden sm:block">
+                                        <img src={service.image_url} alt={service.title} className="w-full h-full object-cover" />
+                                    </div>
+                                )}
                                 <div className="flex flex-col space-y-2 ml-4">
                                     <button
                                         onClick={() => handleEdit(service)}
