@@ -14,7 +14,6 @@ const navLinks = [
     { name: 'Gallery', href: '/gallery' },
     { name: 'Career', href: '/career' },
     { name: 'About Us', href: '/about-us' },
-    { name: 'Contact Us', href: '/contact-us' },
 ];
 
 export default function Navigation() {
@@ -83,9 +82,9 @@ export default function Navigation() {
                         <div className="hidden lg:block">
                             <Link
                                 href="/contact-us"
-                                className="px-6 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                                className="px-6 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase tracking-wider"
                             >
-                                Get Started
+                                Contact US
                             </Link>
                         </div>
 
@@ -132,9 +131,9 @@ export default function Navigation() {
                                 <Link
                                     href="/contact-us"
                                     onClick={() => setIsOpen(false)}
-                                    className="block text-center py-3 px-4 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200"
+                                    className="block text-center py-3 px-4 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 uppercase tracking-wider"
                                 >
-                                    Get Started
+                                    Contact US
                                 </Link>
                             </div>
                         </div>
