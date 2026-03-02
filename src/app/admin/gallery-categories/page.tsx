@@ -109,28 +109,29 @@ export default function GalleryCategoriesPage() {
 
         if (targetIndex < 0 || targetIndex >= newCategories.length) return;
 
-        // Swap
+        // Swap local State
         [newCategories[index], newCategories[targetIndex]] = [newCategories[targetIndex], newCategories[index]];
 
         // Update local state for immediate feedback
         setCategories(newCategories);
 
-        // Update database
+        // Update database positions
         try {
             const updates = newCategories.map((cat, i) => ({
                 id: cat.id,
-                name: cat.name, // name is required for update if not using upsert properly
                 order_index: i + 1
             }));
 
+            // Use upsert with explicit onConflict to ensure it only updates positions
             const { error } = await supabase
                 .from('gallery_categories')
-                .upsert(updates);
+                .upsert(updates, { onConflict: 'id' });
 
             if (error) throw error;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error reordering:', error);
-            fetchCategories(); // Rollback
+            alert('Failed to save the new order: ' + (error.message || 'Unknown error'));
+            fetchCategories(); // Rollback to database state
         }
     };
 
