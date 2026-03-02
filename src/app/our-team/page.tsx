@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Mail, Linkedin, Twitter, RefreshCw, Facebook, Instagram, Youtube, Globe, Github, X, Quote } from 'lucide-react';
+import { Users, Mail, Linkedin, Twitter, RefreshCw, Facebook, Instagram, Youtube, Globe, Github, X, Quote, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
