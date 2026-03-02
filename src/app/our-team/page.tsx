@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Users, Mail, Linkedin, Twitter, RefreshCw, Facebook, Instagram, Youtube, Globe, Github } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Mail, Linkedin, Twitter, RefreshCw, Facebook, Instagram, Youtube, Globe, Github, X, Quote } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
@@ -29,6 +29,7 @@ interface Category {
 export default function OurTeamPage() {
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -172,9 +173,17 @@ export default function OurTeamPage() {
                                                     <p className="text-primary-600 font-bold text-[9px] tracking-[0.15em] uppercase">{member.role}</p>
                                                 </div>
                                                 <div className="pt-3">
-                                                    <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 max-w-[240px] mx-auto font-medium">
+                                                    <p className="text-gray-500 text-xs leading-relaxed line-clamp-3 max-w-[240px] mx-auto font-medium">
                                                         {member.bio}
                                                     </p>
+                                                    {member.bio && member.bio.length > 80 && (
+                                                        <button
+                                                            onClick={() => setSelectedMember(member)}
+                                                            className="mt-2 text-[10px] font-bold text-primary-600 hover:text-primary-800 uppercase tracking-widest transition-colors flex items-center gap-1 mx-auto"
+                                                        >
+                                                            Read Full Bio <Plus size={8} />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -265,6 +274,102 @@ export default function OurTeamPage() {
                     </div>
                 </section>
             </div>
+
+            {/* Bio Modal */}
+            <AnimatePresence>
+                {selectedMember && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedMember(null)}
+                            className="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
+                        >
+                            {/* Close Button */}
+                            <button
+                                onClick={() => setSelectedMember(null)}
+                                className="absolute top-6 right-6 z-10 p-2 bg-white/10 hover:bg-white/20 md:bg-gray-100 md:hover:bg-gray-200 rounded-full transition-colors"
+                            >
+                                <X size={20} className="md:text-gray-900 text-white" />
+                            </button>
+
+                            {/* Image Section */}
+                            <div className="md:w-2/5 relative h-64 md:h-auto bg-primary-900">
+                                {selectedMember.image_url ? (
+                                    <img
+                                        src={selectedMember.image_url}
+                                        alt={selectedMember.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <Users className="text-white/20" size={120} />
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent via-transparent to-black/20" />
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="md:w-3/5 p-8 md:p-12 overflow-y-auto">
+                                <div className="mb-8">
+                                    <div className="inline-block px-3 py-1 bg-primary-50 rounded-full mb-4">
+                                        <span className="text-primary-600 font-bold text-[10px] tracking-[0.2em] uppercase">{selectedMember.role}</span>
+                                    </div>
+                                    <h2 className="text-4xl font-serif text-gray-900 uppercase tracking-tight">{selectedMember.name}</h2>
+                                    <div className="h-0.5 w-12 bg-primary-300 mt-4" />
+                                </div>
+
+                                <div className="relative">
+                                    <Quote className="absolute -left-6 -top-4 text-primary-100" size={48} />
+                                    <p className="relative z-10 text-gray-600 text-lg leading-relaxed font-light italic">
+                                        {selectedMember.bio}
+                                    </p>
+                                </div>
+
+                                {/* Social Links in Modal */}
+                                {(selectedMember.social_links || []).length > 0 && (
+                                    <div className="mt-12 pt-8 border-t border-gray-100">
+                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] mb-4">Connect on Social</h4>
+                                        <div className="flex gap-4">
+                                            {(selectedMember.social_links || []).map((link, i) => {
+                                                const platformIcons: Record<string, any> = {
+                                                    Facebook: Facebook,
+                                                    Instagram: Instagram,
+                                                    Youtube: Youtube,
+                                                    LinkedIn: Linkedin,
+                                                    Twitter: Twitter,
+                                                    Github: Github,
+                                                    Mail: Mail,
+                                                    Website: Globe
+                                                };
+                                                const Icon = platformIcons[link.platform] || Globe;
+                                                return (
+                                                    <a
+                                                        key={i}
+                                                        href={link.url.startsWith('http') ? link.url : (link.platform === 'Mail' ? `mailto:${link.url}` : link.url)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all duration-300"
+                                                    >
+                                                        <Icon size={18} />
+                                                    </a>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </PublicLayout>
     );
 }
