@@ -140,7 +140,7 @@ export default function HomePage() {
                 className="inline-block"
               >
                 <span className="text-primary-600 font-bold text-xs uppercase tracking-[0.3em] mb-4 block">Our Partners</span>
-                <h2 className="text-3xl md:text-5xl font-serif text-gray-900 uppercase tracking-tight">
+                <h2 className="text-4xl md:text-5xl font-serif text-gray-900 uppercase tracking-tight">
                   Trusted by Industry Leaders
                 </h2>
                 <div className="h-px w-16 bg-primary-300 mx-auto mt-6"></div>
@@ -197,10 +197,19 @@ export default function HomePage() {
         {/* Services Overview */}
         <section className="py-24 bg-white relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-serif text-gray-900 uppercase tracking-tighter">Our Services</h2>
-              <div className="h-px w-20 bg-primary-300 mx-auto mt-6 mb-6"></div>
-              <p className="text-gray-600 max-w-2xl mx-auto italic font-light">Providing end-to-end marketing solutions tailored to your business needs.</p>
+            <div className="text-center mb-20">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <span className="text-primary-600 font-bold text-xs uppercase tracking-[0.3em] mb-4 block text-center">Comprehensive Solutions</span>
+                <h2 className="text-4xl md:text-5xl font-serif text-gray-900 uppercase tracking-tight text-center">
+                  Our Expertise & Services
+                </h2>
+                <div className="h-px w-16 bg-primary-300 mx-auto mt-6 mb-8"></div>
+                <p className="text-gray-600 max-w-2xl mx-auto italic font-light text-center">Providing end-to-end marketing solutions tailored to your business needs.</p>
+              </motion.div>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
               {services.map((service, index) => {
@@ -234,11 +243,18 @@ export default function HomePage() {
           <section className="py-24 bg-gray-900 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-end mb-16">
-                <div>
-                  <h2 className="text-4xl md:text-5xl font-serif text-white uppercase tracking-tighter">Latest Work</h2>
-                  <div className="h-px w-20 bg-accent-500/60 mt-6 mb-6"></div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <span className="text-accent-500 font-bold text-xs uppercase tracking-[0.3em] mb-4 block">Portfolio</span>
+                  <h2 className="text-4xl md:text-5xl font-serif text-white uppercase tracking-tight">
+                    Recent Creative Projects
+                  </h2>
+                  <div className="h-px w-16 bg-accent-500/60 mt-6 mb-8"></div>
                   <p className="text-gray-400 max-w-2xl italic font-light">Handpicked projects that showcase our expertise and impact.</p>
-                </div>
+                </motion.div>
                 <Link href="/our-work" className="hidden md:flex items-center space-x-2 text-accent-500 font-bold text-xs uppercase tracking-[0.2em] group border-b border-accent-500/20 pb-1">
                   <span>View All Projects</span>
                   <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
@@ -280,8 +296,18 @@ export default function HomePage() {
         {/* Meet the Leadership */}
         <section className="py-24 bg-gray-50 border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-5xl font-serif text-gray-900 uppercase tracking-widest">Meet the Leadership</h2>
-            <div className="h-px w-16 bg-primary-300 mx-auto mt-6 mb-16"></div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-16"
+            >
+              <span className="text-primary-600 font-bold text-xs uppercase tracking-[0.3em] mb-4 block">Our Team</span>
+              <h2 className="text-4xl md:text-5xl font-serif text-gray-900 uppercase tracking-tight">
+                Meet the Leadership
+              </h2>
+              <div className="h-px w-16 bg-primary-300 mx-auto mt-6"></div>
+            </motion.div>
 
             <div className="flex flex-wrap justify-center gap-16">
               {leadership.map((member, index) => (
