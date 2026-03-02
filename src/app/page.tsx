@@ -52,6 +52,7 @@ export default function HomePage() {
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
+        setLeadership([]); // Fallback to empty if failed, but previous line already handles it
         setLoading(false);
       }
     }
@@ -142,10 +143,11 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="inline-block"
               >
-                <span className="text-primary-600 font-black text-xs uppercase tracking-[0.3em] mb-4 block">Our Partners</span>
-                <h2 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent uppercase tracking-tight">
+                <span className="text-primary-600 font-bold text-xs uppercase tracking-[0.3em] mb-4 block">Our Partners</span>
+                <h2 className="text-3xl md:text-5xl font-serif text-gray-900 uppercase tracking-tight">
                   Trusted by Industry Leaders
                 </h2>
+                <div className="h-px w-16 bg-primary-300 mx-auto mt-6"></div>
               </motion.div>
             </div>
 
@@ -200,9 +202,9 @@ export default function HomePage() {
         <section className="py-24 bg-white relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tighter">Our Services</h2>
-              <div className="h-1.5 w-20 bg-primary-500 mx-auto mb-6"></div>
-              <p className="text-gray-600 max-w-2xl mx-auto">Providing end-to-end marketing solutions tailored to your business needs.</p>
+              <h2 className="text-4xl md:text-5xl font-serif text-gray-900 uppercase tracking-tighter">Our Services</h2>
+              <div className="h-px w-20 bg-primary-300 mx-auto mt-6 mb-6"></div>
+              <p className="text-gray-600 max-w-2xl mx-auto italic font-light">Providing end-to-end marketing solutions tailored to your business needs.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
               {services.map((service, index) => {
@@ -219,10 +221,10 @@ export default function HomePage() {
                     <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors duration-300">
                       <Icon className="text-primary-600 group-hover:text-white transition-colors duration-300" size={28} />
                     </div>
-                    <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
-                    <p className="text-gray-600 mb-6">{service.description}</p>
-                    <Link href="/services" className="text-primary-600 font-semibold inline-flex items-center group-hover:translate-x-2 transition-transform">
-                      Learn More <ArrowRight size={16} className="ml-2" />
+                    <h3 className="text-2xl font-serif uppercase tracking-tight mb-3 group-hover:text-primary-600 transition-colors">{service.title}</h3>
+                    <p className="text-gray-600 mb-6 text-sm leading-relaxed">{service.description}</p>
+                    <Link href="/services" className="text-primary-600 font-bold text-xs uppercase tracking-widest inline-flex items-center group-hover:translate-x-2 transition-transform border-b border-primary-100 pb-1">
+                      Learn More <ArrowRight size={14} className="ml-2" />
                     </Link>
                   </motion.div>
                 );
@@ -237,13 +239,13 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-end mb-16">
                 <div>
-                  <h2 className="text-4xl md:text-5xl font-black mb-4 text-white uppercase tracking-tighter">Latest Work</h2>
-                  <div className="h-1.5 w-20 bg-accent-500 mb-6"></div>
-                  <p className="text-gray-400 max-w-2xl">Handpicked projects that showcase our expertise and impact.</p>
+                  <h2 className="text-4xl md:text-5xl font-serif text-white uppercase tracking-tighter">Latest Work</h2>
+                  <div className="h-px w-20 bg-accent-500/60 mt-6 mb-6"></div>
+                  <p className="text-gray-400 max-w-2xl italic font-light">Handpicked projects that showcase our expertise and impact.</p>
                 </div>
-                <Link href="/our-work" className="hidden md:flex items-center space-x-2 text-accent-500 font-bold group">
+                <Link href="/our-work" className="hidden md:flex items-center space-x-2 text-accent-500 font-bold text-xs uppercase tracking-[0.2em] group border-b border-accent-500/20 pb-1">
                   <span>View All Projects</span>
-                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
                 </Link>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
@@ -256,22 +258,22 @@ export default function HomePage() {
                     transition={{ delay: index * 0.1 }}
                     className="group"
                   >
-                    <div className="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <div className="relative aspect-video rounded-none overflow-hidden mb-6 border border-white/5 group-hover:border-accent-500/30 transition-all duration-500">
                       {project.image_url ? (
-                        <img src={project.image_url} alt={project.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <img src={project.image_url} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-primary-900 to-black flex items-center justify-center">
                           <Briefcase className="text-primary-500/20" size={64} />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <Link href={project.link || '#'} className="p-4 bg-white rounded-full text-primary-900">
-                          <ExternalLink size={24} />
+                      <div className="absolute inset-0 bg-primary-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                        <Link href={project.link || '#'} className="p-4 bg-white rounded-full text-primary-900 hover:scale-110 transition-transform">
+                          <ExternalLink size={20} />
                         </Link>
                       </div>
                     </div>
-                    <span className="text-accent-500 font-bold text-sm uppercase tracking-widest">{project.category}</span>
-                    <h3 className="text-2xl font-bold mt-2 group-hover:text-accent-500 transition-colors uppercase tracking-tight">{project.title}</h3>
+                    <span className="text-accent-500 font-bold text-[10px] uppercase tracking-[0.3em]">{project.category}</span>
+                    <h3 className="text-2xl font-serif text-white mt-2 group-hover:text-accent-500 transition-colors uppercase tracking-tight">{project.title}</h3>
                   </motion.div>
                 ))}
               </div>
@@ -280,50 +282,55 @@ export default function HomePage() {
         )}
 
         {/* Meet the Leadership */}
-        <section className="py-24 bg-gray-50">
+        <section className="py-24 bg-gray-50 border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-4xl font-black mb-4 uppercase tracking-tighter">Meet the Leadership</h2>
-            <div className="h-1.5 w-20 bg-primary-500 mx-auto mb-16"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+            <h2 className="text-3xl md:text-5xl font-serif text-gray-900 uppercase tracking-widest">Meet the Leadership</h2>
+            <div className="h-px w-16 bg-primary-300 mx-auto mt-6 mb-16"></div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
               {leadership.map((member, index) => (
                 <motion.div
                   key={member.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group relative"
+                  className="group text-center"
                 >
-                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-white mb-6 border border-gray-100 group-hover:border-primary-100 transition-all duration-500 hover:shadow-2xl">
-                    {member.image_url ? (
-                      <img
-                        src={member.image_url}
-                        alt={member.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                        <User className="text-gray-200" size={48} />
-                      </div>
-                    )}
+                  <div className="relative mb-8 mx-auto w-56 h-56">
+                    {/* Decorative background circle */}
+                    <div className="absolute inset-0 bg-primary-50 rounded-full scale-0 group-hover:scale-105 transition-transform duration-500 ease-out"></div>
 
-                    {/* Minimal Overlay Info if needed, or keep it clean */}
-                    <Link
-                      href="/our-team"
-                      className="absolute inset-0 bg-primary-900/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]"
-                    >
-                      <span className="text-white font-bold text-xs uppercase tracking-[0.2em] border-b border-white/40 pb-1">View Profile</span>
-                    </Link>
+                    <div className="relative w-full h-full rounded-full overflow-hidden border border-gray-100 group-hover:border-primary-200 transition-colors duration-500 shadow-sm group-hover:shadow-xl">
+                      {member.image_url ? (
+                        <img
+                          src={member.image_url}
+                          alt={member.name}
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                          <User className="text-gray-200" size={56} />
+                        </div>
+                      )}
+
+                      <Link
+                        href="/our-team"
+                        className="absolute inset-0 bg-primary-900/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]"
+                      >
+                        <span className="text-white font-bold text-[10px] uppercase tracking-[0.3em] border-b border-white/40 pb-1">View Profile</span>
+                      </Link>
+                    </div>
                   </div>
 
-                  <div className="text-center space-y-1">
-                    <h3 className="text-2xl font-medium text-gray-900 font-serif group-hover:text-primary-600 transition-colors uppercase tracking-tight">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-serif text-gray-900 group-hover:text-primary-600 transition-colors uppercase tracking-tight">
                       {member.name}
                     </h3>
                     <p className="text-primary-600 font-bold text-[10px] tracking-[0.2em] uppercase">
                       {member.role}
                     </p>
-                    <div className="pt-3 max-w-[250px] mx-auto">
+                    <div className="pt-4 max-w-[280px] mx-auto">
                       <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 italic font-light">
                         {member.bio}
                       </p>
@@ -332,10 +339,11 @@ export default function HomePage() {
                 </motion.div>
               ))}
             </div>
-            <div className="mt-16">
-              <Link href="/our-team" className="inline-flex items-center space-x-3 px-10 py-5 bg-gray-900 text-white font-bold uppercase tracking-widest text-sm hover:bg-primary-600 transition-all shadow-xl">
+
+            <div className="mt-20">
+              <Link href="/our-team" className="inline-flex items-center space-x-3 px-12 py-5 bg-gray-900 text-white font-bold uppercase tracking-widest text-[10px] hover:bg-primary-600 transition-all shadow-2xl">
                 <span>View Full Team</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={14} />
               </Link>
             </div>
           </div>
