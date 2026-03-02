@@ -80,6 +80,7 @@ export default function GalleryCategoriesPage() {
             if (error) throw error;
             setCategories(categories.map(c => c.id === id ? { ...c, name: editName } : c));
             setEditingId(null);
+            alert('Category updated successfully!');
         } catch (error: any) {
             alert(error.message || 'Error updating category');
         } finally {
@@ -119,6 +120,7 @@ export default function GalleryCategoriesPage() {
         try {
             const updates = newCategories.map((cat, i) => ({
                 id: cat.id,
+                name: cat.name,
                 order_index: i + 1
             }));
 
