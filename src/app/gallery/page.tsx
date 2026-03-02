@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { X, ZoomIn, ArrowLeft, ArrowRight, Play, Film, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import PageHeader from '@/components/common/PageHeader';
 
 interface GalleryItem {
     id: string;
@@ -70,8 +71,6 @@ export default function GalleryPage() {
             setGalleryItems(data || []);
         } catch (error) {
             console.error('Error fetching gallery:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -108,258 +107,125 @@ export default function GalleryPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/20 relative overflow-hidden">
-                {/* Decorative background elements */}
-                <div className="absolute top-20 right-20 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-20 w-72 h-72 bg-accent-200/20 rounded-full blur-3xl"></div>
+            <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+                <PageHeader pagePath="/gallery" />
 
-                {/* Hero Section */}
-                <section className="pt-32 pb-16 relative z-10">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="text-center mb-12"
+                {/* Main Content */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+                    {/* Category Filter */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex flex-wrap justify-center gap-4 mb-16"
+                    >
+                        <button
+                            onClick={() => setSelectedCategory('All')}
+                            className={`px-6 py-2.5 rounded-xl font-bold uppercase tracking-wider text-xs transition-all duration-300 ${selectedCategory === 'All'
+                                ? 'bg-primary-900 text-white shadow-xl'
+                                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                                }`}
                         >
-                            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                                Our Gallery
-                            </h1>
-                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                                Explore our successful marketing campaigns, vibrant company culture, and creative moments
-                            </p>
-                        </motion.div>
-
-                        {/* Category Filter */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="flex flex-wrap justify-center gap-4 mb-16"
-                        >
-                            <motion.button
-                                key="All"
-                                onClick={() => setSelectedCategory('All')}
-                                className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${selectedCategory === 'All'
-                                    ? 'backdrop-blur-xl bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-xl border border-white/40'
-                                    : 'backdrop-blur-xl bg-white/60 border border-white/40 text-gray-700 hover:bg-white/80'
+                            All
+                        </button>
+                        {categories.map((category) => (
+                            <button
+                                key={category.id}
+                                onClick={() => setSelectedCategory(category.name)}
+                                className={`px-6 py-2.5 rounded-xl font-bold uppercase tracking-wider text-xs transition-all duration-300 ${selectedCategory === category.name
+                                    ? 'bg-primary-900 text-white shadow-xl'
+                                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                                     }`}
                             >
-                                All
-                            </motion.button>
-                            {categories.map((category, index) => (
-                                <motion.button
-                                    key={category.id}
-                                    initial={{ opacity: 0, scale: 0.8 }}
+                                {category.name}
+                            </button>
+                        ))}
+                    </motion.div>
+
+                    {/* Gallery Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <AnimatePresence mode="popLayout">
+                            {filteredItems.map((item, index) => (
+                                <motion.div
+                                    key={item.id}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: index * 0.1 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => setSelectedCategory(category.name)}
-                                    className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${selectedCategory === category.name
-                                        ? 'backdrop-blur-xl bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-xl border border-white/40'
-                                        : 'backdrop-blur-xl bg-white/60 border border-white/40 text-gray-700 hover:bg-white/80'
-                                        }`}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    whileHover={{ y: -10 }}
+                                    className="group relative cursor-pointer"
+                                    onClick={() => openLightbox(item, index)}
                                 >
-                                    {category.name}
-                                </motion.button>
-                            ))}
-                        </motion.div>
-
-                        {/* Gallery Grid */}
-                        <motion.div
-                            layout
-                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                        >
-                            <AnimatePresence mode="popLayout">
-                                {filteredItems.map((item, index) => (
-                                    <motion.div
-                                        key={item.id}
-                                        layout
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.8 }}
-                                        transition={{ duration: 0.5 }}
-                                        whileHover={{ y: -10 }}
-                                        className="group relative cursor-pointer"
-                                        onClick={() => openLightbox(item, index)}
-                                    >
-                                        <div className="relative backdrop-blur-xl bg-white/60 border border-white/40 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-                                            <div className="absolute -inset-1 bg-gradient-to-r from-primary-400 to-accent-400 opacity-0 group-hover:opacity-30 blur-2xl transition-opacity duration-300"></div>
-
-                                            <div className="relative aspect-[4/3] overflow-hidden">
-                                                <img
-                                                    src={item.src}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
-
-                                                {item.type === 'video' && (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
-                                                        <motion.div
-                                                            whileHover={{ scale: 1.1 }}
-                                                            className="w-20 h-20 backdrop-blur-xl bg-white/20 border-2 border-white rounded-full flex items-center justify-center"
-                                                        >
-                                                            <Play className="w-10 h-10 text-white fill-white ml-1" />
-                                                        </motion.div>
-                                                    </div>
-                                                )}
-
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-6 z-10">
-                                                    <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                                        {item.type === 'video' ? (
-                                                            <>
-                                                                <Film className="w-12 h-12 text-white mx-auto mb-2" />
-                                                                <p className="text-white text-sm font-medium">Click to play</p>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <ZoomIn className="w-12 h-12 text-white mx-auto mb-2" />
-                                                                <p className="text-white text-sm font-medium">Click to view</p>
-                                                            </>
-                                                        )}
+                                    <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100">
+                                        <div className="relative aspect-[4/3] overflow-hidden">
+                                            <img
+                                                src={item.src}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                            {item.type === 'video' && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                                    <div className="w-16 h-16 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50">
+                                                        <Play className="text-white fill-white ml-1" size={32} />
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <div className="p-6 relative z-10">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className={`inline-block px-3 py-1 backdrop-blur-sm border rounded-full text-sm font-semibold ${item.category === 'Campaigns'
-                                                        ? 'bg-primary-500/20 border-primary-300/40 text-primary-700'
-                                                        : item.category === 'Culture'
-                                                            ? 'bg-accent-500/20 border-accent-300/40 text-accent-700'
-                                                            : 'bg-purple-500/20 border-purple-300/40 text-purple-700'
-                                                        }`}>
-                                                        {item.category}
-                                                    </div>
-                                                    {item.type === 'video' && (
-                                                        <div className="inline-flex items-center gap-1 px-2 py-1 backdrop-blur-sm bg-gray-500/20 border border-gray-300/40 rounded-full text-xs font-semibold text-gray-700">
-                                                            <Film size={12} />
-                                                            Video
-                                                        </div>
-                                                    )}
+                                            )}
+                                            <div className="absolute inset-0 bg-primary-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                                                <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                    <ZoomIn className="text-white mx-auto mb-2" size={32} />
+                                                    <p className="text-white text-xs font-bold uppercase tracking-widest">View {item.type}</p>
                                                 </div>
-                                                <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                                                    {item.title}
-                                                </h3>
-                                                <p className="text-gray-600 text-sm leading-relaxed">
-                                                    {item.description}
-                                                </p>
                                             </div>
                                         </div>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </motion.div>
+                                        <div className="p-6">
+                                            <span className="text-primary-600 font-bold text-[10px] uppercase tracking-[0.2em] mb-2 block">{item.category}</span>
+                                            <h3 className="text-xl font-bold text-gray-900 mb-2 truncate">{item.title}</h3>
+                                            <p className="text-gray-500 text-sm line-clamp-2 italic">{item.description}</p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
                     </div>
-                </section>
+                </div>
 
-                {/* Lightbox Modal */}
+                {/* Lightbox */}
                 <AnimatePresence>
                     {selectedItem && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
-                            onClick={closeLightbox}
-                        >
-                            <motion.button
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.8 }}
-                                whileHover={{ scale: 1.1, rotate: 90 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={closeLightbox}
-                                className="absolute top-6 right-6 p-3 backdrop-blur-xl bg-white/10 border border-white/20 rounded-full text-white hover:bg-white/20 transition-all z-50"
-                            >
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl" onClick={closeLightbox}>
+                            <button className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50" onClick={closeLightbox}>
                                 <X size={24} />
-                            </motion.button>
+                            </button>
 
-                            <motion.button
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigateItem('prev');
-                                }}
-                                className="absolute left-6 p-3 backdrop-blur-xl bg-white/10 border border-white/20 rounded-full text-white hover:bg-white/20 transition-all z-50"
-                            >
+                            <button className="absolute left-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50" onClick={(e) => { e.stopPropagation(); navigateItem('prev'); }}>
                                 <ArrowLeft size={24} />
-                            </motion.button>
+                            </button>
 
-                            <motion.button
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigateItem('next');
-                                }}
-                                className="absolute right-6 p-3 backdrop-blur-xl bg-white/10 border border-white/20 rounded-full text-white hover:bg-white/20 transition-all z-50"
-                            >
+                            <button className="absolute right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50" onClick={(e) => { e.stopPropagation(); navigateItem('next'); }}>
                                 <ArrowRight size={24} />
-                            </motion.button>
+                            </button>
 
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.3 }}
+                                className="relative max-w-6xl w-full bg-transparent rounded-3xl overflow-hidden shadow-2xl"
                                 onClick={(e) => e.stopPropagation()}
-                                className="relative max-w-6xl w-full backdrop-blur-2xl bg-white/10 border border-white/20 rounded-3xl overflow-hidden shadow-2xl"
                             >
-                                <div className="relative aspect-video">
+                                <div className="relative aspect-video flex items-center justify-center bg-black/40 rounded-3xl overflow-hidden border border-white/10">
                                     {selectedItem.type === 'video' ? (
-                                        <video
-                                            controls
-                                            autoPlay
-                                            className="w-full h-full object-contain bg-black"
-                                            src={selectedItem.video_src}
-                                        >
-                                            <source src={selectedItem.video_src} type="video/mp4" />
-                                            Your browser does not support the video tag.
+                                        <video controls autoPlay className="max-w-full max-h-full object-contain">
+                                            <source src={selectedItem.video_src || selectedItem.src} type="video/mp4" />
                                         </video>
                                     ) : (
-                                        <img
-                                            src={selectedItem.src}
-                                            alt={selectedItem.title}
-                                            className="w-full h-full object-contain"
-                                        />
+                                        <img src={selectedItem.src} alt={selectedItem.title} className="max-w-full max-h-full object-contain" />
                                     )}
                                 </div>
-                                <div className="p-6 backdrop-blur-xl bg-white/10">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <div className={`inline-block px-3 py-1 backdrop-blur-sm border rounded-full text-sm font-semibold ${selectedItem.category === 'Campaigns'
-                                            ? 'bg-primary-500/30 border-primary-300/40 text-white'
-                                            : selectedItem.category === 'Culture'
-                                                ? 'bg-accent-500/30 border-accent-300/40 text-white'
-                                                : 'bg-purple-500/30 border-purple-300/40 text-white'
-                                            }`}>
-                                            {selectedItem.category}
-                                        </div>
-                                        {selectedItem.type === 'video' && (
-                                            <div className="inline-flex items-center gap-1 px-2 py-1 backdrop-blur-sm bg-white/20 border border-white/30 rounded-full text-xs font-semibold text-white">
-                                                <Film size={12} />
-                                                Video
-                                            </div>
-                                        )}
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">
-                                        {selectedItem.title}
-                                    </h3>
-                                    <p className="text-gray-200 leading-relaxed">
-                                        {selectedItem.description}
-                                    </p>
+                                <div className="mt-6 text-center text-white">
+                                    <h3 className="text-2xl font-bold mb-2 uppercase tracking-wide">{selectedItem.title}</h3>
+                                    <p className="text-gray-400 italic">{selectedItem.description}</p>
                                 </div>
                             </motion.div>
-                        </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
             </div>

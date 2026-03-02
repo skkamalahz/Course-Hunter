@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { ExternalLink, RefreshCw, Briefcase } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
+import PageHeader from '@/components/common/PageHeader';
 
 interface PortfolioItem {
     id: string;
@@ -59,27 +60,8 @@ export default function OurWorkPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen pt-20">
-                {/* Hero Section */}
-                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
-                        >
-                            Our Work
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-xl text-gray-600 max-w-3xl mx-auto"
-                        >
-                            Explore our portfolio of successful projects and campaigns
-                        </motion.p>
-                    </div>
-                </section>
+            <div className="min-h-screen">
+                <PageHeader pagePath="/our-work" />
 
                 {/* Filter Tabs */}
                 <section className="py-8 bg-white border-b">

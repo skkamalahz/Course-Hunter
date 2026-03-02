@@ -5,6 +5,7 @@ import { Users, Mail, Linkedin, Twitter, RefreshCw, Facebook, Instagram, Youtube
 import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { supabase } from '@/lib/supabase';
+import PageHeader from '@/components/common/PageHeader';
 
 interface TeamMember {
     id: string;
@@ -77,20 +78,7 @@ export default function OurTeamPage() {
     return (
         <PublicLayout>
             <div className="min-h-screen bg-white">
-                {/* Banner Section */}
-                <section className="relative h-[40vh] flex items-center justify-center bg-primary-900 overflow-hidden">
-                    <div className="absolute inset-0 opacity-20">
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                    </div>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="relative z-10 text-center"
-                    >
-                        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight font-serif uppercase animate-fade-up">OUR TEAM</h1>
-                        <div className="h-0.5 w-16 bg-accent-500/60 mx-auto"></div>
-                    </motion.div>
-                </section>
+                <PageHeader pagePath="/our-team" />
 
                 <section className="py-24 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
 import * as Icons from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import PageHeader from '@/components/common/PageHeader';
 
 interface Service {
     id: string;
@@ -47,38 +48,10 @@ export default function ServicesPage() {
 
     return (
         <PublicLayout>
-            <div className="relative pt-32 pb-20 overflow-hidden bg-[#fafafa]">
-                {/* Background Decor */}
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] bg-primary-50 rounded-full blur-3xl opacity-50 z-0"></div>
-                <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[600px] h-[600px] bg-accent-50 rounded-full blur-3xl opacity-30 z-0"></div>
+            <div className="min-h-screen bg-[#fafafa]">
+                <PageHeader pagePath="/services" />
 
-                <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
-                    <div className="text-center max-w-3xl mx-auto mb-20">
-                        <motion.span
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="inline-block px-4 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-bold uppercase tracking-widest text-primary-600 mb-6"
-                        >
-                            Our Expertise
-                        </motion.span>
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-5xl md:text-7xl font-serif text-gray-900 mb-8 leading-tight"
-                        >
-                            Innovative <span className="text-primary-600">Solutions</span> for Your Business
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-lg text-gray-600 leading-relaxed font-sans"
-                        >
-                            We combine creativity with data-driven strategies to help your brand stand out in the digital landscape. Explore our wide range of professional services tailored to your needs.
-                        </motion.p>
-                    </div>
-
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 relative z-10">
                     {loading ? (
                         <div className="flex justify-center items-center py-20">
                             <Icons.RefreshCw className="animate-spin text-primary-600" size={40} />
@@ -163,43 +136,43 @@ export default function ServicesPage() {
                         </div>
                     )}
                 </div>
-            </div>
 
-            {/* CTA Section */}
-            <section className="py-24 bg-white overflow-hidden relative border-t border-gray-100">
-                <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        className="bg-primary-900 rounded-[3rem] p-12 md:p-20 relative overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-accent-900 opacity-50"></div>
+                {/* CTA Section */}
+                <section className="py-24 bg-white overflow-hidden relative border-t border-gray-100">
+                    <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10 text-center">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            className="bg-primary-900 rounded-[3rem] p-12 md:p-20 relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-accent-900 opacity-50"></div>
 
-                        <div className="relative z-10">
-                            <h2 className="text-4xl md:text-6xl font-serif text-white mb-8">
-                                Ready to scale your brand?
-                            </h2>
-                            <p className="text-lg text-primary-100 font-sans mb-12 max-w-2xl mx-auto">
-                                Let's collaborate to build something extraordinary. Our team is ready to transform your vision into reality.
-                            </p>
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                                <a
-                                    href="/contact-us"
-                                    className="px-10 py-5 bg-white text-primary-900 font-bold rounded-2xl hover:bg-primary-50 transition-all hover:scale-105 shadow-xl"
-                                >
-                                    Get Started Now
-                                </a>
-                                <a
-                                    href="/our-work"
-                                    className="px-10 py-5 border-2 border-white/30 text-white font-bold rounded-2xl hover:bg-white/10 transition-all"
-                                >
-                                    View Our Work
-                                </a>
+                            <div className="relative z-10">
+                                <h2 className="text-4xl md:text-6xl font-serif text-white mb-8">
+                                    Ready to scale your brand?
+                                </h2>
+                                <p className="text-lg text-primary-100 font-sans mb-12 max-w-2xl mx-auto">
+                                    Let's collaborate to build something extraordinary. Our team is ready to transform your vision into reality.
+                                </p>
+                                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                                    <a
+                                        href="/contact-us"
+                                        className="px-10 py-5 bg-white text-primary-900 font-bold rounded-2xl hover:bg-primary-50 transition-all hover:scale-105 shadow-xl"
+                                    >
+                                        Get Started Now
+                                    </a>
+                                    <a
+                                        href="/our-work"
+                                        className="px-10 py-5 border-2 border-white/30 text-white font-bold rounded-2xl hover:bg-white/10 transition-all"
+                                    >
+                                        View Our Work
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
+                        </motion.div>
+                    </div>
+                </section>
+            </div>
         </PublicLayout>
     );
 }
