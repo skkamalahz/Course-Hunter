@@ -67,7 +67,7 @@ export default function Navigation() {
                             >
                                 <Link
                                     href={link.href}
-                                    className="relative px-3 py-2 text-gray-700 font-medium text-[14px] hover:text-primary-600 transition-colors duration-200 group whitespace-nowrap"
+                                    className="relative px-3 py-2 text-gray-700 font-medium text-[16px] hover:text-primary-600 transition-colors duration-200 group whitespace-nowrap"
                                 >
                                     {link.name}
                                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-accent-600 group-hover:w-full transition-all duration-300 ease-out"></span>
@@ -82,7 +82,7 @@ export default function Navigation() {
                         <div className="hidden lg:block">
                             <Link
                                 href="/contact-us"
-                                className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase tracking-wider"
+                                className="px-5 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold text-sm rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-300 uppercase tracking-wider"
                             >
                                 Contact US
                             </Link>
@@ -131,7 +131,7 @@ export default function Navigation() {
                                 <Link
                                     href="/contact-us"
                                     onClick={() => setIsOpen(false)}
-                                    className="block text-center py-3 px-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 uppercase tracking-wider"
+                                    className="block text-center py-3 px-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold text-sm rounded-xl hover:shadow-lg transition-all duration-200 uppercase tracking-wider"
                                 >
                                     Contact US
                                 </Link>
