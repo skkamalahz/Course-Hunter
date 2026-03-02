@@ -100,49 +100,50 @@ export default function OurTeamPage() {
                                     <div className="h-1 w-20 bg-primary-500 mx-auto mt-6"></div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                     {members.filter(m => m.category === category.name).map((member, index) => (
                                         <motion.div
                                             key={member.id}
                                             initial={{ opacity: 0, y: 30 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true }}
-                                            transition={{ delay: index * 0.1 }}
-                                            className="group bg-white rounded-[2.5rem] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-primary-100"
+                                            transition={{ delay: index * 0.05 }}
+                                            className="group relative"
                                         >
-                                            <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
+                                            <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-gray-50 mb-4 border border-gray-100 group-hover:border-primary-100 transition-all duration-500 hover:shadow-2xl">
                                                 {member.image_url ? (
                                                     <img
                                                         src={member.image_url}
                                                         alt={member.name}
-                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                     />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center">
-                                                        <Users className="text-gray-300" size={80} />
+                                                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                                        <Users className="text-gray-200" size={40} />
                                                     </div>
                                                 )}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
-                                                <div className="absolute bottom-6 left-8 right-8">
-                                                    <h3 className="text-2xl font-bold text-white mb-1 uppercase tracking-tight">{member.name}</h3>
-                                                    <p className="text-accent-400 font-bold text-xs tracking-widest uppercase">{member.role}</p>
+
+                                                {/* Hover Overlay with Socials */}
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4">
+                                                    <a href="#" className="p-2.5 bg-white/10 hover:bg-white text-white hover:text-primary-600 rounded-full backdrop-blur-md transition-all">
+                                                        <Linkedin size={18} />
+                                                    </a>
+                                                    <a href="#" className="p-2.5 bg-white/10 hover:bg-white text-white hover:text-primary-600 rounded-full backdrop-blur-md transition-all">
+                                                        <Twitter size={18} />
+                                                    </a>
+                                                    <a href={`mailto:info@coursehunter.com`} className="p-2.5 bg-white/10 hover:bg-white text-white hover:text-primary-600 rounded-full backdrop-blur-md transition-all">
+                                                        <Mail size={18} />
+                                                    </a>
                                                 </div>
                                             </div>
 
-                                            <div className="p-10">
-                                                <p className="text-gray-600 leading-relaxed mb-8 line-clamp-4 text-sm font-medium">
-                                                    {member.bio}
-                                                </p>
-                                                <div className="flex space-x-4 border-t border-gray-100 pt-8">
-                                                    <a href="#" className="p-3 bg-gray-50 rounded-2xl text-gray-500 hover:bg-primary-500 hover:text-white transition-all hover:-translate-y-1 shadow-sm">
-                                                        <Linkedin size={20} />
-                                                    </a>
-                                                    <a href="#" className="p-3 bg-gray-50 rounded-2xl text-gray-500 hover:bg-primary-500 hover:text-white transition-all hover:-translate-y-1 shadow-sm">
-                                                        <Twitter size={20} />
-                                                    </a>
-                                                    <a href={`mailto:info@coursehunter.com`} className="p-3 bg-gray-50 rounded-2xl text-gray-500 hover:bg-primary-500 hover:text-white transition-all hover:-translate-y-1 shadow-sm">
-                                                        <Mail size={20} />
-                                                    </a>
+                                            <div className="space-y-1">
+                                                <h3 className="text-xl font-medium text-gray-900 font-serif group-hover:text-primary-600 transition-colors uppercase tracking-tight">{member.name}</h3>
+                                                <p className="text-primary-600 font-bold text-[10px] tracking-[0.2em] uppercase">{member.role}</p>
+                                                <div className="pt-2">
+                                                    <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 italic font-light">
+                                                        {member.bio}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -160,30 +161,40 @@ export default function OurTeamPage() {
                                     </h2>
                                     <div className="h-1 w-20 bg-primary-500 mx-auto mt-6"></div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                     {uncategorized.map((member, index) => (
                                         <motion.div
                                             key={member.id}
                                             initial={{ opacity: 0, y: 30 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true }}
-                                            transition={{ delay: index * 0.1 }}
-                                            className="group bg-white rounded-[2.5rem] overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
+                                            transition={{ delay: index * 0.05 }}
+                                            className="group relative"
                                         >
-                                            <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
+                                            <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-gray-50 mb-4 border border-gray-100 group-hover:border-primary-100 transition-all duration-500 hover:shadow-2xl">
                                                 {member.image_url ? (
-                                                    <img src={member.image_url} alt={member.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                                    <img src={member.image_url} alt={member.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center"><Users className="text-gray-300" size={80} /></div>
+                                                    <div className="w-full h-full flex items-center justify-center bg-gray-50"><Users className="text-gray-200" size={40} /></div>
                                                 )}
-                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                <div className="absolute bottom-6 left-8 right-8">
-                                                    <h3 className="text-2xl font-bold text-white mb-1 uppercase tracking-tight">{member.name}</h3>
-                                                    <p className="text-accent-400 font-bold text-xs tracking-widest uppercase">{member.role}</p>
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4">
+                                                    <a href="#" className="p-2.5 bg-white/10 hover:bg-white text-white hover:text-primary-600 rounded-full backdrop-blur-md transition-all">
+                                                        <Linkedin size={18} />
+                                                    </a>
+                                                    <a href="#" className="p-2.5 bg-white/10 hover:bg-white text-white hover:text-primary-600 rounded-full backdrop-blur-md transition-all">
+                                                        <Twitter size={18} />
+                                                    </a>
+                                                    <a href={`mailto:info@coursehunter.com`} className="p-2.5 bg-white/10 hover:bg-white text-white hover:text-primary-600 rounded-full backdrop-blur-md transition-all">
+                                                        <Mail size={18} />
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <div className="p-10">
-                                                <p className="text-gray-600 leading-relaxed mb-8 line-clamp-4 text-sm font-medium">{member.bio}</p>
+                                            <div className="space-y-1">
+                                                <h3 className="text-xl font-medium text-gray-900 font-serif group-hover:text-primary-600 transition-colors uppercase tracking-tight">{member.name}</h3>
+                                                <p className="text-primary-600 font-bold text-[10px] tracking-[0.2em] uppercase">{member.role}</p>
+                                                <div className="pt-2">
+                                                    <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 italic font-light">{member.bio}</p>
+                                                </div>
                                             </div>
                                         </motion.div>
                                     ))}

@@ -284,32 +284,51 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-4xl font-black mb-4 uppercase tracking-tighter">Meet the Leadership</h2>
             <div className="h-1.5 w-20 bg-primary-500 mx-auto mb-16"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
               {leadership.map((member, index) => (
                 <motion.div
                   key={member.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                  className="p-10 bg-white rounded-[2.5rem] shadow-xl flex flex-col h-full hover:shadow-2xl transition-all border border-gray-100 group"
+                  transition={{ delay: index * 0.1 }}
+                  className="group relative"
                 >
-                  <div className="aspect-square bg-gray-50 rounded-[2rem] mb-8 overflow-hidden flex items-center justify-center border-2 border-primary-50 group-hover:border-primary-100 transition-all">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-white mb-6 border border-gray-100 group-hover:border-primary-100 transition-all duration-500 hover:shadow-2xl">
                     {member.image_url ? (
-                      <img src={member.image_url} alt={member.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      <img
+                        src={member.image_url}
+                        alt={member.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
                     ) : (
-                      <User className="text-gray-200" size={64} />
+                      <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                        <User className="text-gray-200" size={48} />
+                      </div>
                     )}
+
+                    {/* Minimal Overlay Info if needed, or keep it clean */}
+                    <Link
+                      href="/our-team"
+                      className="absolute inset-0 bg-primary-900/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]"
+                    >
+                      <span className="text-white font-bold text-xs uppercase tracking-[0.2em] border-b border-white/40 pb-1">View Profile</span>
+                    </Link>
                   </div>
-                  <h3 className="text-2xl font-bold mb-1 uppercase tracking-tight group-hover:text-primary-600 transition-colors">{member.name}</h3>
-                  <p className="text-primary-600 font-bold mb-6 uppercase text-xs tracking-widest">{member.role}</p>
-                  <Link
-                    href="/our-team"
-                    className="mt-auto inline-flex items-center justify-center space-x-2 text-primary-600 font-bold text-xs uppercase tracking-widest hover:text-primary-700 transition-colors"
-                  >
-                    <span>View Details</span>
-                    <ArrowRight size={14} />
-                  </Link>
+
+                  <div className="text-center space-y-1">
+                    <h3 className="text-2xl font-medium text-gray-900 font-serif group-hover:text-primary-600 transition-colors uppercase tracking-tight">
+                      {member.name}
+                    </h3>
+                    <p className="text-primary-600 font-bold text-[10px] tracking-[0.2em] uppercase">
+                      {member.role}
+                    </p>
+                    <div className="pt-3 max-w-[250px] mx-auto">
+                      <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 italic font-light">
+                        {member.bio}
+                      </p>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
