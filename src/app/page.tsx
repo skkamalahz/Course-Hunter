@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { ArrowRight, Target, Sparkles, TrendingUp, Palette, Search, Code, PenTool, Share2, Users, Mail, ExternalLink, Briefcase, User, RefreshCw, Linkedin, Twitter, Star, Quote, ChevronRight, Play, CheckCircle2, Trophy, Lightbulb, Rocket, Facebook, Instagram, Youtube, Globe, Github } from 'lucide-react';
 import PublicLayout from '@/components/layout/PublicLayout';
@@ -75,13 +74,11 @@ export default function HomePage() {
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
           <div className="absolute inset-0">
-            <Image
+            <img
               src={hero?.background_image || "/assets/all-images/5-1.png"}
               alt="Banner Background"
-              fill
-              className="object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: 'blur(3px)', transform: 'scale(1.1)' }}
-              priority
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-primary-500/40 to-transparent z-10"></div>
             <div className="absolute inset-0 bg-primary-500/20 z-10"></div>

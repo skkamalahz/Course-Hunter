@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { X, ZoomIn, ArrowLeft, ArrowRight, Play, Film, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -190,11 +189,10 @@ export default function GalleryPage() {
                                             <div className="absolute -inset-1 bg-gradient-to-r from-primary-400 to-accent-400 opacity-0 group-hover:opacity-30 blur-2xl transition-opacity duration-300"></div>
 
                                             <div className="relative aspect-[4/3] overflow-hidden">
-                                                <Image
+                                                <img
                                                     src={item.src}
                                                     alt={item.title}
-                                                    fill
-                                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />
 
                                                 {item.type === 'video' && (
@@ -329,11 +327,10 @@ export default function GalleryPage() {
                                             Your browser does not support the video tag.
                                         </video>
                                     ) : (
-                                        <Image
+                                        <img
                                             src={selectedItem.src}
                                             alt={selectedItem.title}
-                                            fill
-                                            className="object-contain"
+                                            className="w-full h-full object-contain"
                                         />
                                     )}
                                 </div>
