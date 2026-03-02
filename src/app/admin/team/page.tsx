@@ -96,7 +96,9 @@ export default function AdminTeamPage() {
 
             const { error: uploadError } = await supabase.storage
                 .from('team-images')
-                .upload(filePath, file);
+                .upload(filePath, file, {
+                    contentType: file.type || 'image/webp'
+                });
 
             if (uploadError) throw uploadError;
 
@@ -360,7 +362,7 @@ export default function AdminTeamPage() {
                                             {uploading ? <RefreshCw className="animate-spin" size={18} /> : <Upload size={18} />}
                                             <span className="text-sm font-medium">{uploading ? 'Uploading...' : 'Upload Photo'}</span>
                                         </div>
-                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                        <input type="file" className="hidden" accept="image/*,.webp" onChange={handleImageUpload} disabled={uploading} />
                                     </label>
                                 </div>
                                 <input
