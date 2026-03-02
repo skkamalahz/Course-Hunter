@@ -14,6 +14,9 @@ interface TeamMember {
     image_url?: string;
     category: string;
     order_index: number;
+    linkedin_url?: string;
+    twitter_url?: string;
+    mail_url?: string;
 }
 
 interface Category {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Save, RefreshCw, X, User, ArrowUp, ArrowDown, Upload, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, RefreshCw, X, User, ArrowUp, ArrowDown, Upload, Image as ImageIcon, Linkedin, Twitter, Mail } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface TeamMember {
@@ -13,6 +13,9 @@ interface TeamMember {
     image_url?: string;
     category: string;
     order_index: number;
+    linkedin_url?: string;
+    twitter_url?: string;
+    mail_url?: string;
 }
 
 interface Category {
@@ -35,7 +38,10 @@ export default function AdminTeamPage() {
         role: '',
         bio: '',
         image_url: '',
-        category: 'Team'
+        category: 'Team',
+        linkedin_url: '',
+        twitter_url: '',
+        mail_url: ''
     });
 
     const [newCategoryName, setNewCategoryName] = useState('');
@@ -122,7 +128,16 @@ export default function AdminTeamPage() {
             }
             setShowForm(false);
             setEditingId(null);
-            setFormData({ name: '', role: '', bio: '', image_url: '', category: categories[0]?.name || 'Team' });
+            setFormData({
+                name: '',
+                role: '',
+                bio: '',
+                image_url: '',
+                category: categories[0]?.name || 'Team',
+                linkedin_url: '',
+                twitter_url: '',
+                mail_url: ''
+            });
             fetchMembers();
         } catch (error) {
             console.error('Error saving member:', error);
@@ -225,7 +240,16 @@ export default function AdminTeamPage() {
                         onClick={() => {
                             setShowForm(true);
                             setEditingId(null);
-                            setFormData({ name: '', role: '', bio: '', image_url: '', category: categories[0]?.name || 'Team' });
+                            setFormData({
+                                name: '',
+                                role: '',
+                                bio: '',
+                                image_url: '',
+                                category: categories[0]?.name || 'Team',
+                                linkedin_url: '',
+                                twitter_url: '',
+                                mail_url: ''
+                            });
                         }}
                         className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center space-x-2"
                     >
@@ -344,6 +368,45 @@ export default function AdminTeamPage() {
                                     placeholder="Or paste image URL here..."
                                 />
                             </div>
+
+                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-100 pt-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <Linkedin size={14} className="text-blue-600" /> LinkedIn URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={formData.linkedin_url}
+                                        onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                        placeholder="https://linkedin.com/in/..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <Twitter size={14} className="text-sky-500" /> Twitter URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={formData.twitter_url}
+                                        onChange={(e) => setFormData({ ...formData, twitter_url: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                        placeholder="https://twitter.com/..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <Mail size={14} className="text-gray-500" /> Email Link / URL
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.mail_url}
+                                        onChange={(e) => setFormData({ ...formData, mail_url: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                        placeholder="mailto:example@..."
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
@@ -403,6 +466,11 @@ export default function AdminTeamPage() {
                                             <div>
                                                 <h3 className="text-lg font-bold group-hover:text-primary-700 transition-colors">{member.name}</h3>
                                                 <p className="text-primary-600 font-bold text-xs uppercase tracking-widest">{member.role}</p>
+                                                <div className="flex items-center space-x-2 mt-1">
+                                                    {member.linkedin_url && <Linkedin size={14} className="text-blue-600" />}
+                                                    {member.twitter_url && <Twitter size={14} className="text-sky-500" />}
+                                                    {member.mail_url && <Mail size={14} className="text-gray-500" />}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
