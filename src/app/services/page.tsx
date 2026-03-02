@@ -26,7 +26,7 @@ export default function ServicesPage() {
             try {
                 const [servicesRes, headerRes] = await Promise.all([
                     supabase.from('services').select('*').order('order_index'),
-                    supabase.from('page_headers').select('*').eq('id', 'services').single()
+                    supabase.from('page_headers').select('*').eq('page_path', '/services').single()
                 ]);
 
                 if (servicesRes.error) throw servicesRes.error;

@@ -14,7 +14,7 @@ export default function AdminContentPage() {
     const [homeData, setHomeData] = useState({ title: '', subtitle: '', cta_text: '' });
     const [aboutData, setAboutData] = useState({ title: '', mission: '', vision: '', story: '' });
     const [contactData, setContactData] = useState({ email: '', phone: '', address: '' });
-    const [bannerData, setBannerData] = useState<Record<string, { title: string, subtitle: string }>>({});
+    const [bannerData, setBannerData] = useState<Record<string, { id: string, title: string, subtitle: string }>>({});
 
     useEffect(() => {
         fetchAllData();
@@ -47,9 +47,20 @@ export default function AdminContentPage() {
                 address: contactRes.data.address
             });
             if (bannersRes.data) {
-                const banners: Record<string, { title: string, subtitle: string }> = {};
+                const banners: Record<string, { id: string, title: string, subtitle: string }> = {};
                 bannersRes.data.forEach((b: any) => {
-                    banners[b.id] = { title: b.title, subtitle: b.subtitle };
+                    // Map by pageId patterns
+                    let pageId = '';
+                    if (b.page_path === '/services') pageId = 'services';
+                    else if (b.page_path === '/our-team') pageId = 'team';
+                    else if (b.page_path === '/our-work') pageId = 'work';
+                    else if (b.page_path === '/gallery') pageId = 'gallery';
+                    else if (b.page_path === '/career') pageId = 'career';
+                    else if (b.page_path === '/about-us') pageId = 'about';
+
+                    if (pageId) {
+                        banners[pageId] = { id: b.id, title: b.title, subtitle: b.subtitle };
+                    }
                 });
                 setBannerData(banners);
             }
@@ -110,16 +121,26 @@ export default function AdminContentPage() {
 
     const handleSaveBanner = async (pageId: string) => {
         setSaving(true);
+        const banner = bannerData[pageId];
+        if (!banner?.id) {
+            alert('Banner data not found for this page.');
+            setSaving(false);
+            return;
+        }
+
         try {
             const { error } = await supabase
                 .from('page_headers')
-                .update(bannerData[pageId])
-                .eq('id', pageId);
+                .update({
+                    title: banner.title,
+                    subtitle: banner.subtitle
+                })
+                .eq('id', banner.id);
             if (error) throw error;
             alert(`${pageId.charAt(0).toUpperCase() + pageId.slice(1)} banner updated!`);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Save failed:', error);
-            alert('Save failed');
+            alert(`Save failed: ${error.message || 'Unknown error'}`);
         } finally {
             setSaving(false);
         }

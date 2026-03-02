@@ -38,7 +38,7 @@ export default function GalleryPage() {
         setLoading(true);
         try {
             const [headerRes] = await Promise.all([
-                supabase.from('page_headers').select('*').eq('id', 'gallery').single(),
+                supabase.from('page_headers').select('*').eq('page_path', '/gallery').single(),
                 fetchGallery(),
                 fetchCategories()
             ]);

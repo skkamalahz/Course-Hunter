@@ -39,7 +39,7 @@ export default function OurTeamPage() {
                 const [catResult, memberResult, headerResult] = await Promise.all([
                     supabase.from('team_categories').select('*').order('order_index', { ascending: true }),
                     supabase.from('team_members').select('*').order('order_index', { ascending: true }),
-                    supabase.from('page_headers').select('*').eq('id', 'team').single()
+                    supabase.from('page_headers').select('*').eq('page_path', '/our-team').single()
                 ]);
 
                 if (catResult.error) throw catResult.error;

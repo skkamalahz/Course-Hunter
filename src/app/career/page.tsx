@@ -29,7 +29,7 @@ export default function CareerPage() {
         try {
             const [jobsRes, headerRes] = await Promise.all([
                 supabase.from('careers').select('*').order('order_index', { ascending: true }),
-                supabase.from('page_headers').select('*').eq('id', 'career').single()
+                supabase.from('page_headers').select('*').eq('page_path', '/career').single()
             ]);
 
             if (jobsRes.error) throw jobsRes.error;

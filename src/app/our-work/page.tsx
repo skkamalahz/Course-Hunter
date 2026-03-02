@@ -30,7 +30,7 @@ export default function OurWorkPage() {
         try {
             const [portfolioRes, headerRes] = await Promise.all([
                 supabase.from('portfolio_items').select('*').order('order_index', { ascending: true }),
-                supabase.from('page_headers').select('*').eq('id', 'work').single()
+                supabase.from('page_headers').select('*').eq('page_path', '/our-work').single()
             ]);
 
             if (portfolioRes.error) throw portfolioRes.error;

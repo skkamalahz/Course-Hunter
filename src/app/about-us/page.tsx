@@ -29,7 +29,7 @@ export default function AboutUsPage() {
         try {
             const [aboutRes, headerRes] = await Promise.all([
                 supabase.from('about_settings').select('*').eq('id', 'about_001').single(),
-                supabase.from('page_headers').select('*').eq('id', 'about').single()
+                supabase.from('page_headers').select('*').eq('page_path', '/about-us').single()
             ]);
 
             if (aboutRes.error) throw aboutRes.error;
