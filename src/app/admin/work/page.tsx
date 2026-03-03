@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, RefreshCw, X, Link as LinkIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, RefreshCw, X, Link as LinkIcon, Upload, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Project {
@@ -21,6 +21,7 @@ export default function AdminWorkPage() {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState<Partial<Project>>({
         title: '',
         category: 'Web Development',
@@ -49,28 +50,66 @@ export default function AdminWorkPage() {
         }
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `portfolio-photos/${fileName}`;
+
+            // Use 'gallery-images' bucket as it's already established for photos
+            const { error: uploadError } = await supabase.storage
+                .from('gallery-images')
+                .upload(filePath, file, {
+                    contentType: file.type || 'image/webp'
+                });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('gallery-images')
+                .getPublicUrl(filePath);
+
+            setFormData(prev => ({ ...prev, image_url: publicUrl }));
+        } catch (error: any) {
+            console.error('Error uploading image:', error);
+            alert('Error uploading image: ' + (error.message || 'Check storage permissions.'));
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
+            // Destructure to remove 'id' if it exists in formData
+            const { id, ...saveData } = formData as any;
+
             if (editingId) {
                 const { error } = await supabase
                     .from('portfolio_items')
-                    .update(formData)
+                    .update(saveData)
                     .eq('id', editingId);
                 if (error) throw error;
             } else {
                 const { error } = await supabase
                     .from('portfolio_items')
-                    .insert([{ ...formData, order_index: projects.length }]);
+                    .insert([{ ...saveData, order_index: projects.length }]);
                 if (error) throw error;
             }
             setShowForm(false);
             setEditingId(null);
             setFormData({ title: '', category: 'Web Development', description: '', image_url: '', client: '', link: '' });
             fetchProjects();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving project:', error);
-            alert('Error saving project');
+            alert('Error saving project: ' + (error.message || 'Check database constraints.'));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -156,14 +195,38 @@ export default function AdminWorkPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                            <input
-                                type="text"
-                                value={formData.image_url}
-                                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                placeholder="https://example.com/image.jpg"
-                            />
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Project Image</label>
+                            <div className="flex items-center space-x-4 mb-3">
+                                <div className="relative group w-20 h-20 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                                    {formData.image_url ? (
+                                        <img src={formData.image_url} className="w-full h-full object-cover" alt="Preview" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <ImageIcon size={24} />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                    <label className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all text-sm font-semibold text-gray-700">
+                                        {uploading ? <RefreshCw className="animate-spin mr-2" size={16} /> : <Upload className="mr-2" size={16} />}
+                                        <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*,.webp"
+                                            onChange={handleImageUpload}
+                                            disabled={uploading}
+                                        />
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Or paste direct image URL..."
+                                        value={formData.image_url || ''}
+                                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm"
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Client Name</label>
