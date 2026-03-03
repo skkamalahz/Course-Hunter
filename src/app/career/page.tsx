@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Briefcase, Calendar, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
+import PageBanner from '@/components/layout/PageBanner';
 import { supabase } from '@/lib/supabase';
 
 interface Job {
@@ -18,7 +19,10 @@ interface Job {
 
 export default function CareerPage() {
     const [jobs, setJobs] = useState<Job[]>([]);
-    const [header, setHeader] = useState({ title: 'Career', subtitle: 'Join our team and be part of something amazing' });
+    const [header, setHeader] = useState<{ title: string, subtitle: string, background_image?: string }>({
+        title: 'Career',
+        subtitle: 'Join our team and be part of something amazing'
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -38,7 +42,8 @@ export default function CareerPage() {
             if (headerRes.data) {
                 setHeader({
                     title: headerRes.data.title,
-                    subtitle: headerRes.data.subtitle
+                    subtitle: headerRes.data.subtitle,
+                    background_image: headerRes.data.background_image
                 });
             }
         } catch (error) {
@@ -60,27 +65,12 @@ export default function CareerPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen pt-20">
-                {/* Hero Section */}
-                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
-                        >
-                            {header.title}
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-xl text-gray-600 max-w-3xl mx-auto"
-                        >
-                            {header.subtitle}
-                        </motion.p>
-                    </div>
-                </section>
+            <div className="min-h-screen">
+                <PageBanner
+                    title={header.title}
+                    subtitle={header.subtitle}
+                    backgroundImage={header.background_image}
+                />
 
                 {/* Job Listings */}
                 <section className="py-20 bg-white">

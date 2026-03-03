@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
+import PageBanner from '@/components/layout/PageBanner';
 import * as Icons from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -18,7 +19,10 @@ interface Service {
 
 export default function ServicesPage() {
     const [services, setServices] = useState<Service[]>([]);
-    const [header, setHeader] = useState({ title: 'Services', subtitle: 'Explore our professional solutions tailored to your business needs and drive sustainable growth.' });
+    const [header, setHeader] = useState<{ title: string, subtitle: string, background_image?: string }>({
+        title: 'Services',
+        subtitle: 'Explore our professional solutions tailored to your business needs and drive sustainable growth.'
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -37,7 +41,8 @@ export default function ServicesPage() {
                 } else if (headerRes.data) {
                     setHeader({
                         title: headerRes.data.title,
-                        subtitle: headerRes.data.subtitle
+                        subtitle: headerRes.data.subtitle,
+                        background_image: headerRes.data.background_image
                     });
                 }
             } catch (error) {
@@ -57,25 +62,11 @@ export default function ServicesPage() {
 
     return (
         <PublicLayout>
-            <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50 pt-32">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
-                    >
-                        {header.title}
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-xl text-gray-600 max-w-3xl mx-auto"
-                    >
-                        {header.subtitle}
-                    </motion.p>
-                </div>
-            </section>
+            <PageBanner
+                title={header.title}
+                subtitle={header.subtitle}
+                backgroundImage={header.background_image}
+            />
 
             <div className="relative pt-20 pb-20 overflow-hidden bg-[#fafafa]">
                 {/* Background Decor */}

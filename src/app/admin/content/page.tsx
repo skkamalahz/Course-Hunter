@@ -14,7 +14,7 @@ export default function AdminContentPage() {
     const [homeData, setHomeData] = useState({ title: '', subtitle: '', cta_text: '' });
     const [aboutData, setAboutData] = useState({ title: '', mission: '', vision: '', story: '' });
     const [contactData, setContactData] = useState({ email: '', phone: '', address: '' });
-    const [bannerData, setBannerData] = useState<Record<string, { id: string, title: string, subtitle: string }>>({});
+    const [bannerData, setBannerData] = useState<Record<string, { id: string, title: string, subtitle: string, background_image?: string | null }>>({});
 
     useEffect(() => {
         fetchAllData();
@@ -59,7 +59,12 @@ export default function AdminContentPage() {
                     else if (b.page_path === '/about-us') pageId = 'about';
 
                     if (pageId) {
-                        banners[pageId] = { id: b.id, title: b.title, subtitle: b.subtitle };
+                        banners[pageId] = {
+                            id: b.id,
+                            title: b.title,
+                            subtitle: b.subtitle,
+                            background_image: b.background_image
+                        };
                     }
                 });
                 setBannerData(banners);
@@ -135,6 +140,7 @@ export default function AdminContentPage() {
                 .update({
                     title: banner.title.trim(),
                     subtitle: banner.subtitle.trim(),
+                    background_image: banner.background_image?.trim() || null,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', banner.id)
@@ -143,12 +149,21 @@ export default function AdminContentPage() {
             if (error) throw error;
             console.log('Update result:', data);
 
+            if (!data || data.length === 0) {
+                throw new Error('No rows were updated. This might be due to database permissions or an invalid record ID.');
+            }
+
             alert(`${pageId.charAt(0).toUpperCase() + pageId.slice(1)} banner updated successfully!`);
             // Immediate local state sync before global fetch
             if (data && data[0]) {
                 setBannerData(prev => ({
                     ...prev,
-                    [pageId]: { ...prev[pageId], title: data[0].title, subtitle: data[0].subtitle }
+                    [pageId]: {
+                        ...prev[pageId],
+                        title: data[0].title,
+                        subtitle: data[0].subtitle,
+                        background_image: data[0].background_image
+                    }
                 }));
             }
             fetchAllData();
@@ -294,6 +309,20 @@ export default function AdminContentPage() {
                                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 outline-none bg-white transition-all"
                                                 rows={2}
                                             />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Background Image URL</label>
+                                            <input
+                                                type="text"
+                                                placeholder="https://images.unsplash.com/..."
+                                                value={bannerData[pageId]?.background_image || ''}
+                                                onChange={(e) => setBannerData({
+                                                    ...bannerData,
+                                                    [pageId]: { ...bannerData[pageId], background_image: e.target.value }
+                                                })}
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 outline-none bg-white transition-all"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-400 italic">Leave empty to use default gradient background</p>
                                         </div>
                                         <button
                                             onClick={() => handleSaveBanner(pageId)}

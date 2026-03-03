@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/components/layout/PublicLayout';
+import PageBanner from '@/components/layout/PageBanner';
 import { X, ZoomIn, ArrowLeft, ArrowRight, Play, Film, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -24,7 +25,10 @@ interface Category {
 export default function GalleryPage() {
     const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [header, setHeader] = useState({ title: 'Our Gallery', subtitle: 'Explore our successful marketing campaigns, vibrant company culture, and creative moments' });
+    const [header, setHeader] = useState<{ title: string, subtitle: string, background_image?: string }>({
+        title: 'Our Gallery',
+        subtitle: 'Explore our successful marketing campaigns, vibrant company culture, and creative moments'
+    });
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
@@ -46,7 +50,8 @@ export default function GalleryPage() {
             if (headerRes.data) {
                 setHeader({
                     title: headerRes.data.title,
-                    subtitle: headerRes.data.subtitle
+                    subtitle: headerRes.data.subtitle,
+                    background_image: headerRes.data.background_image
                 });
             }
         } finally {
@@ -117,31 +122,12 @@ export default function GalleryPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-50 via-white to-primary-50/20 relative overflow-hidden">
-                {/* Decorative background elements */}
-                <div className="absolute top-20 right-20 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-20 w-72 h-72 bg-accent-200/20 rounded-full blur-3xl"></div>
-
-                {/* Hero Section */}
-                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
-                        >
-                            {header.title}
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-xl text-gray-600 max-w-3xl mx-auto"
-                        >
-                            {header.subtitle}
-                        </motion.p>
-                    </div>
-                </section>
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/20 relative overflow-hidden">
+                <PageBanner
+                    title={header.title}
+                    subtitle={header.subtitle}
+                    backgroundImage={header.background_image}
+                />
 
                 {/* Main Content */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">

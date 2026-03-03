@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Mail, Linkedin, Twitter, RefreshCw, Facebook, Instagram, Youtube, Globe, Github, X, Quote, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layout/PublicLayout';
+import PageBanner from '@/components/layout/PageBanner';
 import { supabase } from '@/lib/supabase';
 
 interface TeamMember {
@@ -29,7 +30,10 @@ interface Category {
 export default function OurTeamPage() {
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [header, setHeader] = useState({ title: 'Our Team', subtitle: 'Meet the dedicated professionals driving our mission forward and delivering excellence' });
+    const [header, setHeader] = useState<{ title: string, subtitle: string, background_image?: string }>({
+        title: 'Our Team',
+        subtitle: 'Meet the dedicated professionals driving our mission forward and delivering excellence'
+    });
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -51,7 +55,8 @@ export default function OurTeamPage() {
                 if (headerResult.data) {
                     setHeader({
                         title: headerResult.data.title,
-                        subtitle: headerResult.data.subtitle
+                        subtitle: headerResult.data.subtitle,
+                        background_image: headerResult.data.background_image
                     });
                 }
             } catch (error) {
@@ -85,27 +90,12 @@ export default function OurTeamPage() {
 
     return (
         <PublicLayout>
-            <div className="min-h-screen bg-white pt-20">
-                {/* Hero Section */}
-                <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent"
-                        >
-                            {header.title}
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-xl text-gray-600 max-w-3xl mx-auto"
-                        >
-                            {header.subtitle}
-                        </motion.p>
-                    </div>
-                </section>
+            <div className="min-h-screen bg-white">
+                <PageBanner
+                    title={header.title}
+                    subtitle={header.subtitle}
+                    backgroundImage={header.background_image}
+                />
 
                 <section className="py-24 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
