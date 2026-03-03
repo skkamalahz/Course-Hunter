@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, RefreshCw, Layout, Info, Mail, Image as ImageIcon } from 'lucide-react';
+import { Save, RefreshCw, Layout, Info, Mail, Image as ImageIcon, Upload } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AdminContentPage() {
     const [activeTab, setActiveTab] = useState('home');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState<string | null>(null); // Stores pageId being uploaded
 
     // Form states
     const [homeData, setHomeData] = useState({ title: '', subtitle: '', cta_text: '' });
@@ -121,6 +122,51 @@ export default function AdminContentPage() {
             alert('Save failed');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, pageId: string) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(pageId);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `banner-photos/${fileName}`;
+
+            // Try to upload to 'banner-images' bucket, fallback to 'gallery-images' if it fails
+            let bucketName = 'banner-images';
+            const { error: uploadError } = await supabase.storage
+                .from(bucketName)
+                .upload(filePath, file, {
+                    contentType: file.type || 'image/webp'
+                });
+
+            if (uploadError) {
+                console.warn('Failed to upload to banner-images, trying gallery-images...');
+                bucketName = 'gallery-images';
+                const { error: fallbackError } = await supabase.storage
+                    .from(bucketName)
+                    .upload(filePath, file, {
+                        contentType: file.type || 'image/webp'
+                    });
+                if (fallbackError) throw fallbackError;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from(bucketName)
+                .getPublicUrl(filePath);
+
+            setBannerData(prev => ({
+                ...prev,
+                [pageId]: { ...prev[pageId], background_image: publicUrl }
+            }));
+        } catch (error: any) {
+            console.error('Error uploading image:', error);
+            alert('Error uploading image: ' + (error.message || 'Check storage permissions.'));
+        } finally {
+            setUploading(null);
         }
     };
 
@@ -311,18 +357,42 @@ export default function AdminContentPage() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Background Image URL</label>
-                                            <input
-                                                type="text"
-                                                placeholder="https://images.unsplash.com/..."
-                                                value={bannerData[pageId]?.background_image || ''}
-                                                onChange={(e) => setBannerData({
-                                                    ...bannerData,
-                                                    [pageId]: { ...bannerData[pageId], background_image: e.target.value }
-                                                })}
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 outline-none bg-white transition-all"
-                                            />
-                                            <p className="mt-1 text-xs text-gray-400 italic">Leave empty to use default gradient background</p>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Background Image</label>
+                                            <div className="flex items-center space-x-4 mb-3">
+                                                <div className="relative group w-20 h-20 flex-shrink-0 bg-white rounded-xl overflow-hidden border border-gray-200">
+                                                    {bannerData[pageId]?.background_image ? (
+                                                        <img src={bannerData[pageId].background_image!} className="w-full h-full object-cover" alt="Preview" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                                                            <ImageIcon size={24} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 space-y-2">
+                                                    <label className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all text-sm font-semibold text-gray-700">
+                                                        {uploading === pageId ? <RefreshCw className="animate-spin mr-2" size={16} /> : <Upload className="mr-2" size={16} />}
+                                                        <span>{uploading === pageId ? 'Uploading...' : 'Upload Image'}</span>
+                                                        <input
+                                                            type="file"
+                                                            className="hidden"
+                                                            accept="image/*,.webp"
+                                                            onChange={(e) => handleImageUpload(e, pageId)}
+                                                            disabled={!!uploading}
+                                                        />
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Or paste direct image URL..."
+                                                        value={bannerData[pageId]?.background_image || ''}
+                                                        onChange={(e) => setBannerData({
+                                                            ...bannerData,
+                                                            [pageId]: { ...bannerData[pageId], background_image: e.target.value }
+                                                        })}
+                                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary-500 outline-none bg-white transition-all text-sm"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <p className="mt-1 text-xs text-gray-400 italic">Recommended: High resolution landscape image (1920x600px)</p>
                                         </div>
                                         <button
                                             onClick={() => handleSaveBanner(pageId)}
