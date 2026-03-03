@@ -47,7 +47,7 @@ export default function AdminContentPage() {
                 address: contactRes.data.address
             });
             if (bannersRes.data) {
-                const banners: Record<string, { id: string, title: string, subtitle: string }> = {};
+                const banners: Record<string, { id: string, title: string, subtitle: string, background_image?: string | null }> = {};
                 bannersRes.data.forEach((b: any) => {
                     // Map by pageId patterns
                     let pageId = '';
